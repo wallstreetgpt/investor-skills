@@ -75,7 +75,7 @@ def build():
 
 
 def args(**kw):
-    a = dict(lens="all", min_cap=1e9, min_revenue=2e8, theme=None, days=14, top=20, discount=0.09,
+    a = dict(lens="all", min_cap=1e9, min_revenue=2e8, theme=None, days=7, top=20, discount=0.09,
              keep_flagged=False, no_news=False, no_headlines=False, include_otc=False, no_write=True)
     a.update(kw)
     return SimpleNamespace(**a)

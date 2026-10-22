@@ -32,7 +32,7 @@ it is saved once and works in every folder.
 python "${CLAUDE_SKILL_DIR}/scanner.py"                                 # all lenses
 python "${CLAUDE_SKILL_DIR}/scanner.py" --lens gap --min-cap 5e9        # one lens, bigger companies
 python "${CLAUDE_SKILL_DIR}/scanner.py" --lens quality --theme "data center"
-python "${CLAUDE_SKILL_DIR}/scanner.py" --lens catalysts --days 7
+python "${CLAUDE_SKILL_DIR}/scanner.py" --lens catalysts --days 30   # news window: default 7 days
 python "${CLAUDE_SKILL_DIR}/scanner.py" news NVDA,MSFT,KO               # newsflow for a watchlist
 python "${CLAUDE_SKILL_DIR}/scanner.py" news --watchlist my-stocks.txt
 ```
@@ -48,7 +48,7 @@ later runs take seconds (cached). Tell the user that before the first run.
 | `gap` | Expectations gap | The growth the price assumes (Priced-In's reverse DCF, 9% required return) is 5+ points below the company's own revenue growth (the lower of its 3-year and last-year rates, counted at 40% at most); positive free cash flow 2 years running; return on capital 10%+; no acquisitions |
 | `fallen` | Fallen quality | Return on capital 12%+ in each of 3 years, steady gross margin, positive free cash flow, and 25%+ below its 52-week high |
 | `accelerating` | Accelerating growth | Latest quarter's revenue +15% on a year ago and 5+ points faster than a year earlier (which was already positive), margin holding, positive free cash flow, no acquisition |
-| `catalysts` | Fresh catalysts | A positive 8-K in the last 14 days (raised guidance, record results or backlog, new or larger buyback, dividend increase, major contract), positive operating cash flow, return on capital 10%+ |
+| `catalysts` | Fresh catalysts | A positive 8-K in the last 7 days (raised guidance, record results or backlog, new or larger buyback, dividend increase, major contract), positive operating cash flow, return on capital 10%+ |
 | `all` | Combined | Average percentile rank on return on capital, own revenue growth and the expectations gap |
 
 Kept out on purpose (each counted in the output):

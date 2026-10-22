@@ -1018,7 +1018,7 @@ def main(argv=None):
         ap = argparse.ArgumentParser(prog="scanner.py news", description="Newsflow for your own list of tickers.")
         ap.add_argument("tickers", nargs="?", help="comma-separated, e.g. NVDA,MSFT,KO")
         ap.add_argument("--watchlist", help="a text file with one ticker per line")
-        ap.add_argument("--days", type=int, default=14)
+        ap.add_argument("--days", type=int, default=7)
         ap.add_argument("--no-write", action="store_true")
         args = ap.parse_args(argv[1:])
         tickers = [t.strip().upper() for t in (args.tickers or "").split(",") if t.strip()]
@@ -1043,7 +1043,7 @@ def main(argv=None):
     ap.add_argument("--min-cap", type=float, default=1e9, help="minimum market cap in USD (default 1e9)")
     ap.add_argument("--min-revenue", type=float, default=2e8, help="minimum yearly revenue in USD (default 2e8)")
     ap.add_argument("--theme", help='only companies whose annual report mentions this phrase, e.g. "data center"')
-    ap.add_argument("--days", type=int, default=14, help="newsflow window for catalysts and headlines (default 14)")
+    ap.add_argument("--days", type=int, default=7, help="newsflow window for catalysts and headlines (default 7)")
     ap.add_argument("--top", type=int, default=20, help="names per lens (default 20)")
     ap.add_argument("--discount", type=float, default=0.09)
     ap.add_argument("--keep-flagged", action="store_true", help="keep names with restatement or going-concern flags")
