@@ -8,6 +8,8 @@ simulate 10,000 possible next decades.
 Plain Python with nothing to install and no API keys. They read SEC filings
 and free market data, and show the source of every number.
 
+> Educational use only, not financial advice. Read the [disclaimer](#disclaimer).
+
 | skill | the question | how it answers |
 | --- | --- | --- |
 | `/idea-scanner` | What is worth a closer look? | Scans every US-listed SEC filer (about 1,800 worth $1B+) through stated lenses (quality compounders, expectations gap, fallen quality, accelerating growth, fresh catalysts) with 8-K newsflow, red flags and headlines. Also scans a watchlist for news. |
@@ -263,8 +265,15 @@ connection to sec.gov and yahoo.com.
   hold customer money can show inflated cash flow, and a headline that names
   a company can be mostly about another one.
 
-**Not financial advice.** This is research tooling: arithmetic on public
-filings and prices. It never says buy or sell.
+## Disclaimer
+
+This content is for educational purposes only and should not be considered
+financial advice. Nothing here is a recommendation to buy or sell any
+security. I am not a licensed financial advisor. All investing carries risk
+including total loss of capital, and past performance does not predict future
+results. AI tools can make mistakes. To the fullest extent permitted by law I
+accept no liability for any loss arising from your use of this content. Your
+decisions are your own. Speak to a licensed professional before investing.
 
 ## Terms of use
 
