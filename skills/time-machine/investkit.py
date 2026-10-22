@@ -41,6 +41,14 @@ VERSION = "1.0.0"
 DISCLAIMER = ("Education and research tooling, not financial advice. "
               "Numbers come from public filings and free market data, which can lag or be wrong.")
 
+# the full disclaimer, word for word, at the foot of every report page
+REPORT_DISCLAIMER = ("This content is for educational purposes only and should not be considered financial advice. "
+                     "Nothing here is a recommendation to buy or sell any security. I am not a licensed financial "
+                     "advisor. All investing carries risk including total loss of capital, and past performance does "
+                     "not predict future results. AI tools can make mistakes. To the fullest extent permitted by law I "
+                     "accept no liability for any loss arising from your use of this content. Your decisions are your "
+                     "own. Speak to a licensed professional before investing.")
+
 GZIP_MAGIC = bytes([0x1F, 0x8B])
 
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -1501,9 +1509,10 @@ def report_page(title, eyebrow, heading, thesis, body_html, description=""):
             "<style>%s</style>\n"
             '<div class="wrap">\n<header class="top"><div class="eyebrow">%s</div><h1>%s</h1>'
             '<p class="thesis">%s</p></header>\n%s\n'
-            '<footer class="fine"><span>%s</span><span>Made with Investor Skills. Generated %s from SEC EDGAR filings '
-            "and Yahoo Finance prices.</span></footer>\n</div>\n<script>%s</script>\n"
-            % (esc(title), esc(description), REPORT_CSS, eb, esc(heading), thesis, body_html, esc(DISCLAIMER),
+            '<footer class="fine"><span><b>Disclaimer:</b> %s</span><span>Made with Investor Skills. Generated %s from '
+            "SEC EDGAR filings and Yahoo Finance prices, which can lag or be wrong.</span></footer>\n</div>\n"
+            "<script>%s</script>\n"
+            % (esc(title), esc(description), REPORT_CSS, eb, esc(heading), thesis, body_html, esc(REPORT_DISCLAIMER),
                today().strftime("%d %b %Y"), REPORT_JS))
 
 

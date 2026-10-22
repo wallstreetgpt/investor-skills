@@ -1391,12 +1391,11 @@ def report(d, ev, notes, prior=None):
                 '</div><ul class="links">%s</ul></section>' % (
                     "".join("<span><b>%s</b> - %s</span>" % (E(a), E(b)) for a, b in legend),
                     "".join('<li><a href="%s">%s</a></li>' % (E(u), E(t)) for t, u in links)))
-    body.append('<div class="disclaimer"><p style="margin:0 0 8px"><span class="hard">Educational content only. Not financial '
-                'advice and not a recommendation to buy or sell any security.</span></p><p style="margin:0 0 8px">The scores are a '
-                'framework for organising evidence, not a recommendation. They come from public filings and free market data, '
-                'which can lag or be wrong, and from thresholds that are judgment calls (each one is printed above). Verify '
-                'independently and consult a licensed professional before investing.</p><p style="margin:0">Prepared %s · '
-                'Investor Skills by WallStreetGPT</p></div>' % nice_date(ik.today().isoformat()))
+    body.append('<div class="disclaimer"><p style="margin:0 0 8px"><span class="hard">Disclaimer:</span> %s</p>'
+                '<p style="margin:0 0 8px">The scores are a framework for organising evidence. They come from public filings '
+                'and free market data, which can lag or be wrong, and from thresholds that are judgment calls (each one is '
+                'printed above).</p><p style="margin:0">Prepared %s · Investor Skills by WallStreetGPT</p></div>'
+                % (E(ik.REPORT_DISCLAIMER), nice_date(ik.today().isoformat())))
     title = "%s Scorecard" % d["ticker"]
     desc = "%s scores %d/100 (%s) on five weighted pillars: quality, trend, forward growth, valuation, catalysts and risk." % (
         d["ticker"], round(score), ev["band"])

@@ -31,7 +31,7 @@ class Reports(unittest.TestCase):
         # charts take colours from tokens, never hard-coded fills
         for svg in re.findall(r'<svg class="chart".*?</svg>', html, re.S):
             self.assertIsNone(re.search(r'(fill|stroke)="#', svg), "hard-coded colour in a chart")
-        self.assertIn("not financial advice", html.lower())
+        self.assertIn(ik.esc(ik.REPORT_DISCLAIMER), html)  # the full disclaimer, word for word
         return html
 
     def test_all_five(self):
