@@ -1138,6 +1138,8 @@ SVG_STYLE = """<style>
   .refl{stroke:#898781;stroke-width:1.5;fill:none;stroke-dasharray:6 5}
   .wash1{fill:#3987e5;fill-opacity:.16} .wash2{fill:#3987e5;fill-opacity:.32}
   .zone{fill:#199e70} .ceil{fill:#e66767;fill-opacity:.24} .ring{stroke:#141413;stroke-width:2}
+  .spag{stroke:#3987e5;stroke-opacity:.2;stroke-width:1;fill:none} .typl{stroke:#f0efec;stroke-width:3;fill:none}
+  .todayl{stroke:#6a6a64;stroke-width:1;stroke-dasharray:3 4} .hit{fill:none}
   .box{fill:#3987e5} .boxl{stroke:#5a5a55;stroke-width:1;fill:none} .chokel{stroke:#c98500;stroke-width:4;fill:none}
   .good{fill:#0ca30c} .warn{fill:#fab219} .crit{fill:#d03b3b} .na{fill:#5a5a55} .badge{fill:#141413;font:700 14px system-ui,Segoe UI,Arial}
 </style>"""
@@ -1298,6 +1300,9 @@ footer.fine { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(
 .chart .wash1 { fill: var(--s1); fill-opacity: .14; } .chart .wash2 { fill: var(--s1); fill-opacity: .30; }
 .chart .zone { fill: var(--s3); } .chart .ceil { fill: var(--s8); fill-opacity: .22; } .chart .ring { stroke: var(--ring); stroke-width: 2; }
 .chart .hit { fill: transparent; } .chart [data-tip]:hover { opacity: .85; }
+.chart .spag { stroke: var(--s1); stroke-opacity: .16; stroke-width: 1; fill: none; }
+.chart .typl { stroke: var(--ink); stroke-width: 3; fill: none; stroke-linejoin: round; }
+.chart .todayl { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 4; }
 @media (max-width: 560px) { .facts { grid-template-columns: 1fr; } .kpi .v { font-size: 24px; } th, td { padding: 8px 10px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 """

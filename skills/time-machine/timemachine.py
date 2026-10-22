@@ -29,6 +29,7 @@ import argparse
 import math
 import os
 import random
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,8 @@ DEFAULTS = {"years": 10, "amount": 10000.0, "paths": 10000, "block": 12, "seed":
             "benchmark": "SPY", "market_return": 0.09}
 
 MIN_MONTHS = 36
+PATHS_DRAWN = 250       # lines on the chart, spread evenly over the range of outcomes
+HISTORY_MONTHS = 36    # real months shown before today
 
 
 # ---------------------------------------------------------------- data
@@ -190,6 +193,14 @@ def simulate(rs, rb, scen, args):
                           for t in range(months)]
             res["fan_invested"] = [sum(contrib[:t + 1]) for t in range(months)]
             res["fan_bench"] = [ik.percentile(sorted(r[t] for r in fanb), 50) for t in range(months)]
+            order = sorted(range(len(fan)), key=lambda i: ends[i])
+            n = min(PATHS_DRAWN, len(order))
+            res["paths_sample"] = [fan[order[int((j + 0.5) / n * len(order))]] for j in range(n)]
+            # the real past, in the same money: what the amount was worth over the last 3 years, ending today
+            past = [contrib[0]]
+            for r in reversed(raw_s[-HISTORY_MONTHS:]):
+                past.append(past[-1] / math.exp(r))
+            res["history_path"] = list(reversed(past))
         results.append(res)
     del raw_s, raw_b
     return results
@@ -312,21 +323,27 @@ def render(ticker, args, used, hs, hw, results, doc):
 
 
 def fan_chart(ticker, args, res, inline=False):
-    """Fan of futures on a log scale: 90% and 50% bands, the typical path, the S&P's typical path, money put in."""
+    """One thin line per simulated future (a sample spread evenly over the outcomes), leading out of
+    the stock's real last 3 years, with the typical future, the S&P's typical path and the money put in."""
     if "fan" not in res:
         return None
-    W, H = 960, (460 if inline else 540)
-    ml, mr, mb = 72, (150 if not inline else 132), 46
+    W, H = 960, (480 if inline else 540)
+    ml, mr, mb = 72, 150, 46
     mt = 24 if inline else 92
     fan, inv, bench = res["fan"], res["fan_invested"], res.get("fan_bench")
+    paths, past = res.get("paths_sample") or [], res.get("history_path") or []
     months = len(fan)
-    # log scale: compounding is multiplicative, and the typical path stays visible
-    top = math.log(max(row[4] for row in fan) * 1.15)
-    lo_v = math.log(max(1.0, min(min(row[0] for row in fan), inv[0]) * 0.8))
+    start = inv[0]
+    back = len(past) - 1  # months of real history before today
+    # value at step k: k = -back..-1 is the past, 0 is today, 1..months the future
+    ends = sorted(p[-1] for p in paths) or [fan[-1][0], fan[-1][4]]
+    lo_vals = [ends[int(len(ends) * 0.02)], min(r[0] for r in fan), start] + past
+    hi_vals = [ends[min(len(ends) - 1, int(len(ends) * 0.98))], max(r[4] for r in fan)] + past
+    lo_v, top = math.log(max(1.0, min(lo_vals) * 0.85)), math.log(max(hi_vals) * 1.15)
     pw, ph = W - ml - mr, H - mt - mb
 
-    def x(t):
-        return ml + t / float(months - 1) * pw
+    def x(k):
+        return ml + (k + back) / float(months + back) * pw
 
     def y(v):
         return mt + ph - (math.log(max(v, 1e-9)) - lo_v) / float(top - lo_v) * ph
@@ -342,33 +359,41 @@ def fan_chart(ticker, args, res, inline=False):
             e += 1
         return out
 
-    def band(a, b, cls):
-        pts = ["%.1f,%.1f" % (x(t), y(fan[t][a])) for t in range(months)]
-        pts += ["%.1f,%.1f" % (x(t), y(fan[t][b])) for t in range(months - 1, -1, -1)]
-        return '<polygon class="%s" points="%s"/>' % (cls, " ".join(pts))
+    def future(vals, cls):
+        pts = [(x(0), y(start))] + [(x(t + 1), y(v)) for t, v in enumerate(vals)]
+        return '<polyline class="%s" points="%s"/>' % (cls, " ".join("%.1f,%.1f" % p for p in pts))
 
-    def line(vals, cls):
-        return '<polyline class="%s" points="%s"/>' % (cls, " ".join("%.1f,%.1f" % (x(t), y(v)) for t, v in enumerate(vals)))
-
+    clip = "tm-%s-%s" % (re.sub(r"[^A-Za-z0-9]", "", ticker), "in" if inline else "svg")
     b = []
     if not inline:
         b.append('<text class="title" x="%d" y="40">%s: %s possible next %d years</text>'
                  % (ml, ik.esc(ticker), "{:,}".format(args.paths), args.years))
-        b.append('<text class="sub" x="%d" y="66">%s</text>' % (ml, ik.esc(res["label"])))
+        b.append('<text class="sub" x="%d" y="66">%s. %d of the futures drawn, spread evenly from worst to best.</text>'
+                 % (ml, ik.esc(res["label"]), len(paths)))
+    b.append('<defs><clipPath id="%s"><rect x="%d" y="%d" width="%d" height="%d"/></clipPath></defs>' % (clip, ml, mt, pw, ph))
     for tv in log_ticks():
         b.append('<line class="grid" x1="%d" x2="%d" y1="%.1f" y2="%.1f"/>' % (ml, W - mr, y(tv), y(tv)))
         b.append('<text class="axis" x="%d" y="%.1f" text-anchor="end">%s</text>' % (ml - 8, y(tv) + 4, ik.money(tv, 0)))
+    if back:
+        b.append('<text class="axis" x="%.1f" y="%d" text-anchor="middle">%d years ago</text>' % (x(-back), mt + ph + 22, back // 12))
     for yr in range(0, args.years + 1, max(1, args.years // 5)):
-        t = min(yr * 12, months - 1)
-        b.append('<text class="axis" x="%.1f" y="%d" text-anchor="middle">Year %d</text>' % (x(t), mt + ph + 22, yr))
-    b.append(band(0, 4, "wash1"))
-    b.append(band(1, 3, "wash2"))
-    b.append(line(inv, "refl"))
+        b.append('<text class="axis" x="%.1f" y="%d" text-anchor="middle">%s</text>'
+                 % (x(min(yr * 12, months)), mt + ph + 22, "Today" if yr == 0 else "Year %d" % yr))
+    b.append('<g clip-path="url(#%s)">' % clip)
+    for p in paths:
+        b.append(future(p, "spag"))
+    b.append(future(inv[1:] + [inv[-1]], "refl"))
     if bench:
-        b.append(line(bench, "mutl"))
-    b.append(line([r[2] for r in fan], "s1l"))
+        b.append(future(bench, "mutl"))
+    b.append(future([r[2] for r in fan], "typl"))
+    b.append('</g>')
+    b.append('<line class="todayl" x1="%.1f" x2="%.1f" y1="%d" y2="%d"/>' % (x(0), x(0), mt, mt + ph))
+    if back:
+        b.append('<polyline class="inkl" points="%s"/>' % " ".join(
+            "%.1f,%.1f" % (x(k - back), y(v)) for k, v in enumerate(past)))
+        b.append('<text class="note" x="%.1f" y="%d">the last %d years</text>' % (x(-back) + 4, mt + 14, back // 12))
+    b.append('<circle class="s1 ring" cx="%.1f" cy="%.1f" r="5"/>' % (x(0), y(start)))
     end = fan[-1]
-    b.append('<circle class="s1 ring" cx="%.1f" cy="%.1f" r="5"/>' % (x(months - 1), y(end[2])))
     placed = []
     for p, lbl in ((4, "Great (95th)"), (2, "Typical"), (0, "Bad (5th)")):
         yy = y(end[p]) + 4
@@ -383,20 +408,21 @@ def fan_chart(ticker, args, res, inline=False):
             yb = placed[1] + 18
         b.append('<text class="note" x="%d" y="%.1f">%s %s</text>' % (W - mr + 10, yb, ik.esc(args.benchmark),
                                                                       ik.money(bench[-1], 0)))
-    # hover columns: one per year, with that year's spread
-    for t in range(0, months, 12):
+    # hover columns (report only): one per year, with that year's spread across all the futures
+    for t in (range(0, months, 12) if inline else ()):
         t2 = min(t + 12, months) - 1
         r = fan[t2]
         text = "Year %d\nGreat (95th): %s\nTypical: %s\nBad (5th): %s\nPut in: %s%s" % (
             (t2 + 1) // 12, ik.money(r[4], 0), ik.money(r[2], 0), ik.money(r[0], 0), ik.money(inv[t2], 0),
             ("\n%s typical: %s" % (args.benchmark, ik.money(bench[t2], 0))) if bench else "")
         b.append('<rect class="hit" x="%.1f" y="%d" width="%.1f" height="%d"%s/>'
-                 % (x(t), mt, x(t2) - x(t) + 0.5, ph, ik.tip(text)))
+                 % (x(t), mt, x(t2 + 1) - x(t), ph, ik.tip(text)))
     if not inline:
-        b.append('<text class="note" x="%d" y="%d">Shaded: middle 50%% and 90%% of futures (log scale). Grey line: %s. '
-                 'Dashed: money put in. Not a forecast.</text>' % (ml, H - 10, ik.esc(args.benchmark)))
+        b.append('<text class="note" x="%d" y="%d">Each thin line is one simulated future (log scale). White: the typical one. '
+                 'Grey: %s. Dashed: money put in. Not a forecast.</text>' % (ml, H - 10, ik.esc(args.benchmark)))
     return ik.svg_wrap(W, H, "\n".join(b), inline=inline,
-                       label="Fan chart of simulated portfolio values over %d years" % args.years)
+                       label="%d simulated futures over %d years, one line each, after the last %d years of real prices"
+                             % (len(paths), args.years, back // 12))
 
 
 def report(ticker, args, used, hs, hw, results, doc):
@@ -418,12 +444,15 @@ def report(ticker, args, used, hs, hw, results, doc):
             {"k": "Typical worst fall", "v": ik.pct(primary["dd_median"], 0),
              "s": "1 in 10 futures: %s or worse" % ik.pct(primary["dd_bad"], 0), "tone": "down"}]
     body = [ik.h_kpis(kpis)]
-    legend = [("--s1", "Typical future", "line"), ("--s1", "Middle 50% and 90% of futures", "box"),
-              ("--muted", "S&P 500 typical", "line"), ("--muted", "Money put in", "dash")]
+    legend = [("--s1", "One simulated future", "line"), ("--ink", "Typical future", "line"),
+              ("--ink", "The last 3 years", "line"), ("--muted", "S&P 500 typical", "line"),
+              ("--muted", "Money put in", "dash")]
     body.append(ik.h_section("%s possible next %d years" % ("{:,}".format(args.paths), args.years), ik.h_figure(
         fan_chart(ticker, args, primary, inline=True),
-        "Scenario shown: %s. Log scale, so equal steps are equal percentage moves. Hover a year for its spread."
-        % ik.esc(label), legend)))
+        "Scenario shown: %s. %d of the %s futures are drawn, one line each, picked evenly from worst to best so "
+        "the bundle shows the true spread. Log scale, so equal steps are equal percentage moves. Hover a year for "
+        "its spread across all futures." % (ik.esc(label), len(primary.get("paths_sample") or []),
+                                           "{:,}".format(args.paths)), legend)))
     rows, mark = [], None
     for i, r in enumerate(results):
         rows.append([r["label"], ik.pct(r["annual_return"]) if r["annual_return"] is not None else "history",
@@ -524,7 +553,8 @@ def main(argv=None):
         payload = {"years": args.years, "amount": args.amount, "monthly": args.monthly, "paths": args.paths,
                    "seed": args.seed, "block": args.block, "benchmark": args.benchmark,
                    "history": {"months": len(used), "from": used[0], "to": used[-1], **hs, "windows": hw},
-                   "scenarios": [{k: v for k, v in r.items() if k not in ("fan", "fan_invested")} for r in results]}
+                   "scenarios": [{k: v for k, v in r.items() if k not in ("fan", "fan_invested", "fan_bench", "paths_sample",
+                                                                         "history_path")} for r in results]}
         path = ik.save_section(ticker, "time_machine", payload)
         extra = ""
         if svg:
