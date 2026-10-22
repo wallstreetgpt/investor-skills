@@ -1,0 +1,13 @@
+{
+  "name": "investor-skills",
+  "owner": {
+    "name": "WallStreetGPT"
+  },
+  "plugins": [
+    {
+      "name": "investor-skills",
+      "source": "./",
+      "description": "Idea Scanner, Irreplaceable Test, Priced-In Calculator, Buy Zone Finder and Time Machine: research tools for long-term investors, built on SEC filings and free market data."
+    }
+  ]
+}

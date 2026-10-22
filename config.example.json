@@ -1,0 +1,16 @@
+{
+  "sec_user_agent": "Your Name you@yourmail.com",
+  "priced_in": {
+    "discount": 0.09,
+    "terminal": 0.025,
+    "years": 10
+  },
+  "time_machine": {
+    "years": 10,
+    "amount": 10000,
+    "paths": 10000,
+    "block": 12,
+    "seed": 2026,
+    "benchmark": "SPY"
+  }
+}

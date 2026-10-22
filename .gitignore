@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+# each user's own results and settings
+investor/
+.investor/
