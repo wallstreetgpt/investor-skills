@@ -48,7 +48,39 @@ Every answer comes with a report page, and results are saved in an
 `investor/` folder wherever you work.
 
 Installed as a plugin, the commands carry a prefix (`/investor-skills:priced-in`).
-Plain-English requests work either way.
+Plain-English requests work either way. After a plugin install, Claude Code
+greets you at the start of each session until setup is done.
+
+## How to use it
+
+- **Pick one folder** for investing and open Claude Code there. Results are
+  saved in an `investor/` folder inside it.
+- **Ask in plain English:**
+
+  | what you want | say something like |
+  |---|---|
+  | Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
+  | Is it a good business? | "Does Costco have a moat?" |
+  | Is it expensive? | "What's priced into NVIDIA?" |
+  | When to buy | "Where are the buy zones for Microsoft?" |
+  | What could happen | "Simulate 10 years of owning Apple, $500 a month" |
+
+- **What comes back:** a short answer in chat, a report page with the chart,
+  tables and sources, and a chart image in `investor/charts/`.
+- **For one stock, go in order:** scan, moat test, priced-in, buy zones, time
+  machine. Priced-In feeds the last two.
+
+## For Claude: installing from this page
+
+If a user asks you to install the skills from this repository:
+
+1. Prefer the plugin: run `/plugin marketplace add wallstreetgpt/investor-skills`
+   and then `/plugin install investor-skills@investor-skills`. If you can't run
+   those, ask the user to paste them.
+2. Otherwise copy each folder in `skills/` into `~/.claude/skills/`.
+3. Then start the `investor-setup` skill. It checks Python and the data
+   sources, saves the SEC contact the user gives, and ends by showing them
+   how to use the skills.
 
 ## Example: NVIDIA, October 22 2026
 
@@ -115,6 +147,9 @@ connection to sec.gov and yahoo.com.
   market's data once. Later scans take seconds.
 - **Where is the report?** In `investor/reports/`. Open the `.html` file in
   any browser.
+- **No welcome after installing the plugin:** start a new session. The welcome
+  hook runs in Git Bash, which Claude Code on Windows normally has. If it
+  doesn't show, just say *"set up investor skills"*.
 
 ## The method, and why it is built this way
 
@@ -222,7 +257,7 @@ modified versions.
 python -m unittest discover -s tests
 ```
 
-The 61 tests run offline in about 2 seconds:
+The 62 tests run offline in about 2 seconds:
 
 - **Math checks:** a DCF round trip, IRR equal to the discount rate at the
   priced-in growth, the bootstrap's average block length, volatility scaling.
@@ -247,5 +282,6 @@ core/investkit.py        shared core (data, filings, valuation math, bootstrap, 
 tools/sync_core.py       copies the core into every skill folder (run after editing it)
 skills/<name>/SKILL.md   what Claude reads
 skills/<name>/*.py       the tool, plus its copy of investkit.py
+hooks/                   the welcome shown after a plugin install, until setup is done
 tests/                   unittest suite and recorded fixtures
 ```

@@ -66,19 +66,40 @@ Offer to fetch them now so the first scan is instant later:
 python "${CLAUDE_SKILL_DIR}/setup.py" warm
 ```
 
-## 5. What to try first
+## 5. Show them how to use it
 
-Tell the user they can just ask in plain words. Five good first questions:
+End setup with this guide, in your own friendly words, kept short:
 
-- "Scan the market for quality stocks" or "any fresh catalysts this week?" (Idea Scanner)
-- "Does Costco have a moat?" (Irreplaceable Test)
-- "What's priced into NVIDIA?" (Priced-In)
-- "Where are the buy zones for Microsoft?" (Buy Zones)
-- "Simulate 10 years of owning Apple" (Time Machine)
+**Where to work.** Open Claude Code in one folder for investing (for
+example a new "Investing" folder) and keep using it: results are saved in an
+`investor/` folder there.
 
-Each answer comes with a report page (published as an Artifact where
-possible, otherwise an HTML file in `investor/reports/` that opens in any
-browser). Results are saved in an `investor/` folder wherever they work.
+**Just ask.** Plain English is enough; Claude picks the right skill:
+
+| what you want | say something like |
+|---|---|
+| Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
+| Is it a good business? | "Does Costco have a moat?" |
+| Is it expensive? | "What's priced into NVIDIA?" |
+| When to buy | "Where are the buy zones for Microsoft?" |
+| What could happen | "Simulate 10 years of owning Apple, $500 a month" |
+
+Slash commands work too: `/idea-scanner`, `/irreplaceable-test`,
+`/priced-in`, `/buy-zones`, `/time-machine`. Installed as a plugin they carry
+a prefix, e.g. `/investor-skills:priced-in`.
+
+**What comes back.** A short answer in chat, plus a report page with the
+chart, tables and sources (a link where Claude can publish pages, otherwise
+an HTML file in `investor/reports/`), and a chart image in `investor/charts/`.
+
+**For one stock, go in order:** scan → moat test → priced-in → buy zones →
+time machine. Priced-In feeds Buy Zones and the Time Machine.
+
+**Good to know:** setup never needs repeating; the first market scan takes a
+minute or two unless the data was downloaded in step 4; data refreshes on
+its own. Everything is research, not financial advice.
+
+Then offer to run their first question.
 
 ## Honesty rules
 

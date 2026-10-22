@@ -168,6 +168,32 @@ class Setup(unittest.TestCase):
 
 
 class Packaging(unittest.TestCase):
+    def test_welcome_hook_until_setup_is_done(self):
+        import json
+        import shutil
+        import tempfile
+        bash = shutil.which("bash")
+        if not bash:
+            self.skipTest("bash not available")
+        home = tempfile.mkdtemp()
+        env = dict(os.environ, INVESTOR_HOME=home)
+        script = os.path.join(ROOT, "hooks", "welcome.sh")
+        try:
+            out = subprocess.run([bash, script], env=env, capture_output=True, text=True).stdout
+            msg = json.loads(out)
+            self.assertIn("set up investor skills", msg["systemMessage"])
+            self.assertEqual(msg["hookSpecificOutput"]["hookEventName"], "SessionStart")
+            with open(os.path.join(home, "config.json"), "w") as f:
+                f.write('{"sec_user_agent": "Jane Doe jane@mail.com"}')
+            out = subprocess.run([bash, script], env=env, capture_output=True, text=True).stdout
+            self.assertEqual(out, "")
+        finally:
+            shutil.rmtree(home, ignore_errors=True)
+        with open(os.path.join(ROOT, "hooks", "hooks.json")) as f:
+            hooks = json.load(f)["hooks"]["SessionStart"][0]
+        self.assertEqual(hooks["matcher"], "startup")
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/hooks/welcome.sh", hooks["hooks"][0]["command"])
+
     def test_every_skill_carries_the_same_core(self):
         code = subprocess.call([sys.executable, os.path.join(ROOT, "tools", "sync_core.py"), "--check"])
         self.assertEqual(code, 0, "run tools/sync_core.py")

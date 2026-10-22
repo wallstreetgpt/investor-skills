@@ -1,0 +1,7 @@
+{
+  "systemMessage": "Investor Skills is installed. Say \"set up investor skills\" to get started (about 2 minutes, once).",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "The user has installed the Investor Skills plugin (idea-scanner, irreplaceable-test, priced-in, buy-zones, time-machine, investor-setup) but has not finished setup yet. In your first reply this session, before anything else: welcome them in two or three short, plain lines; say the skills research stocks from free SEC filings and market data; say a one-time setup takes about two minutes (it checks Python and the data sources and asks for a name and email that the SEC requires); and offer to start it now with the investor-setup skill. If their first message asks for something else, help with it and mention setup in one line. Setup ends by showing them how to use the skills. Do not repeat this welcome later in the session."
+  }
+}

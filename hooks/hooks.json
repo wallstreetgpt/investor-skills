@@ -1,0 +1,17 @@
+{
+  "description": "Investor Skills: welcome new users and point them to setup until it is done",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/welcome.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
