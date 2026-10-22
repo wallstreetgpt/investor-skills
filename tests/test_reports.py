@@ -7,7 +7,7 @@ from _helpers import Offline, ik, load, run
 pricedin = load("priced-in", "pricedin")
 tm = load("time-machine", "timemachine")
 bz = load("buy-zones", "buyzones")
-moat = load("irreplaceable-test", "moat")
+sc = load("scorecard", "scorecard")
 
 
 class Reports(unittest.TestCase):
@@ -44,9 +44,10 @@ class Reports(unittest.TestCase):
             self.assertIn("data-tip=", html)
             self.assertEqual(run(bz.main, ["NVDA", "--paths", "200"])[0], 0)
             self.check_page(os.path.join(d, "reports", "NVDA-buy-zones.html"), "NVDA Buy Zones")
-            self.assertEqual(run(moat.main, ["KO", "--competition-summary", "Coca-Cola names PepsiCo."])[0], 0)
-            html = self.check_page(os.path.join(d, "reports", "KO-irreplaceable.html"), "KO Moat Test")
-            self.assertIn("Coca-Cola names PepsiCo.", html)
+            self.assertEqual(run(sc.main, ["NVDA", "--no-text", "--no-news"])[0], 0)
+            html = self.check_page(os.path.join(d, "reports", "NVDA-scorecard.html"), "NVDA Scorecard")
+            self.assertIn("SCORE / 100", html)
+            self.assertIn("data-tip=", html)  # the P/E history chart has hover details
 
     def test_standalone_svgs_keep_their_dark_style(self):
         with Offline():

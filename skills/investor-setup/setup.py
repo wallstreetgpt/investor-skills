@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import investkit as ik  # noqa: E402
 
-SKILLS = ["idea-scanner", "irreplaceable-test", "priced-in", "buy-zones", "time-machine"]
+SKILLS = ["idea-scanner", "scorecard", "priced-in", "buy-zones", "time-machine"]
 
 
 def installed():

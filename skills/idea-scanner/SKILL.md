@@ -93,7 +93,7 @@ Every run writes a finished report page, `investor/reports/scan-<lens>.html`
    fall looks like a temporary scare or a broken thesis, labelled as your
    reading.
 4. The next step for each name, as the report's "Next step" column suggests:
-   `/irreplaceable-test` (is the quality real), `/priced-in` (what the price
+   `/scorecard` (the full weighed picture), `/priced-in` (what the price
    assumes on trailing numbers) or `/buy-zones`.
 
 ## Honesty rules

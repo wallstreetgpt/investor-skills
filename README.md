@@ -1,9 +1,9 @@
 # Investor Skills
 
 Five Claude skills for long-term investors. Scan the whole market for ideas
-and their news, test whether a company has a real moat, see what its price
-already assumes, find where buyers have stepped in before, and simulate
-10,000 possible next decades.
+and their news, score how attractive a stock is on five weighted pillars, see
+what its price already assumes, find where buyers have stepped in before, and
+simulate 10,000 possible next decades.
 
 Plain Python with nothing to install and no API keys. They read SEC filings
 and free market data, and show the source of every number.
@@ -11,12 +11,12 @@ and free market data, and show the source of every number.
 | skill | the question | how it answers |
 | --- | --- | --- |
 | `/idea-scanner` | What is worth a closer look? | Scans every US-listed SEC filer (about 1,800 worth $1B+) through stated lenses (quality compounders, expectations gap, fallen quality, accelerating growth, fresh catalysts) with 8-K newsflow, red flags and headlines. Also scans a watchlist for news. |
-| `/irreplaceable-test` | Is it a moat or a story? | Six PASS/WARN/FAIL tests from the company's own filings: pricing power through 2022-23 inflation, margin resilience, return on capital, return on new capital, largest-customer reliance, dilution. |
+| `/scorecard` | How attractive is it, all things weighed? | A 0-100 score on five weighted pillars, every input with its rule and source: operating quality, recent trend, forward growth (consensus, the company's own guidance and how often it beat it), valuation (absolute, against peers, against its own 10-year P/E) and catalysts and risk. Claude adds the thesis, drivers and risks from the filings. |
 | `/priced-in` | What does the price already expect? | A reverse DCF: the growth rate today's price implies, checked against the company's own record and the base rate for every US company its size since 2011. |
 | `/buy-zones` | Where is a good price to start buying? | Support zones found by rules (swing lows, old ceilings turned floors, volume shelves, 200-day and 200-week averages), each with its track record, the odds of price getting there, and the growth priced in at that level. |
 | `/time-machine` | What could the next 10 years look like? | A Monte Carlo of 10,000 futures. The shape comes from the stock's real monthly returns, paired with the S&P 500. The center comes from Priced-In's growth scenarios, not from the past. |
 
-**Scan → Test it → Price it → Time it → Live it.** Each skill saves its
+**Scan → Score it → Price it → Time it → Live it.** Each skill saves its
 results to `investor/<TICKER>.json`, and the next one picks them up.
 
 ## Quick start
@@ -39,7 +39,7 @@ read free public data.
    - offers to download the market data in advance.
 3. **Ask.** For example:
    - *"Scan the market for quality stocks"*
-   - *"Does Costco have a moat?"*
+   - *"Score Costco"*
    - *"What's priced into NVIDIA?"*
    - *"Where are the buy zones for Microsoft?"*
    - *"Simulate 10 years of owning Apple"*
@@ -60,14 +60,14 @@ greets you at the start of each session until setup is done.
   | what you want | say something like |
   |---|---|
   | Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
-  | Is it a good business? | "Does Costco have a moat?" |
+  | Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" |
   | Is it expensive? | "What's priced into NVIDIA?" |
   | When to buy | "Where are the buy zones for Microsoft?" |
   | What could happen | "Simulate 10 years of owning Apple, $500 a month" |
 
 - **What comes back:** a short answer in chat, a report page with the chart,
   tables and sources, and a chart image in `investor/charts/`.
-- **For one stock, go in order:** scan, moat test, priced-in, buy zones, time
+- **For one stock, go in order:** scan, scorecard, priced-in, buy zones, time
   machine. Priced-In feeds the last two.
 
 ## For Claude: installing from this page
@@ -104,10 +104,16 @@ Priced-In figure from recorded data.
   - Odds of price reaching the deepest zone within a year: 37%.
   - Valuation floor: $110. Below that, the price would only assume what a
     top-quarter company its size achieves. No chart zone reaches it.
-- **Irreplaceable Test:** 67/100, "real advantages, with cracks to watch".
-  - Pass: return on capital (median 111%) and on new capital (74%).
-  - Warn: one direct customer is 22% of revenue.
-  - Fail: gross margin fell 8 points in 2022.
+- **Scorecard:** 81/100, Highly Attractive, confidence High (peers AVGO, AMD,
+  TSM, MU).
+  - Pillars: quality 86, trend 92, forward growth 95, valuation 70, catalysts
+    and risk 59.
+  - Revenue grew 106% in the latest quarter; guidance for the next is $108.0B,
+    and it beat its own revenue guidance in each of the last four quarters.
+  - Trailing P/E 28x against a 5-year median of 65x, but a 2.4% free cash flow
+    yield and EV/EBITDA above the peer median.
+  - Weakest pillar: one direct customer is 22% of revenue, and buybacks plus
+    dividends are only 1.2% of the market value.
 - **Idea Scanner** (whole market, same day):
   - It scanned 1,755 companies; 81 passed quality compounders, 108 the
     expectations gap and 92 fallen quality.
@@ -200,8 +206,22 @@ connection to sec.gov and yahoo.com.
   zone. They are checked against how often a fall that deep happened in the
   last 5 years. The two agree within a few points on the stocks tested.
 
-**Irreplaceable Test.**
-- Every threshold is printed beside its result and can be changed with flags.
+**Scorecard.**
+- **Every input is a rule:** it scores 0-100 on a straight line between two
+  printed values (free cash flow yield: 0 at 1%, 100 at 7%). A pillar is the
+  average of its inputs; the composite weights quality, trend and forward
+  growth 20% each, valuation 25% and catalysts and risk 15%. Missing inputs
+  are left out and lower the confidence level, never guessed.
+- **Guidance is read from the filings:** the revenue outlook in each results
+  press release (8-K, exhibit 99), checked against what the company then
+  reported, gives the "beat its own guidance" record.
+- **Its own history, done properly:** trailing P/E for every month of 10
+  years uses only the earnings known that month, split-adjusted, with the
+  fourth quarter derived from figures on the same share basis.
+- **Peers are Claude's choice** (business model and end market, stated in the
+  report) and compared on Yahoo's figures for every company, like with like.
+- **Claude's part is marked:** the thesis, drivers, risks and what would change
+  the view carry a "Claude" tag; every computed number carries its source.
 - The customer test reads the annual report's own sentences and shows them.
   It handles negations, groups ("ten largest customers"), distributors,
   receivables-only mentions and "respectively" lists.
@@ -211,7 +231,7 @@ connection to sec.gov and yahoo.com.
   one figure for every filer (about 110 requests, cached), and Yahoo prices
   400 tickers per request.
 - **Same definitions as the single-company skills:** return on capital as in
-  the Irreplaceable Test, and the expectations gap from Priced-In's reverse DCF.
+  the Scorecard, and the expectations gap from Priced-In's reverse DCF.
 - **Rules against the usual screening traps:**
   - own growth is the lower of the 3-year and last-year rates, so post-COVID
     rebounds do not count, and it is capped at 40% a year;
@@ -235,8 +255,9 @@ connection to sec.gov and yahoo.com.
   out, so the real odds are somewhat worse than shown.
 - Support zones are fitted to the same history their records are measured
   on, which flatters them a little. The output says so.
-- The Irreplaceable Test cannot see technology shifts. Conglomerates,
-  financials and very young companies fit it poorly.
+- The Scorecard's thresholds are judgment calls (each is printed), and
+  consensus and peer figures are Yahoo's estimates. Banks, insurers and very
+  young companies fit its rules poorly.
 - The Idea Scanner uses the last full calendar year from SEC frames, so it
   can differ from Priced-In's trailing-twelve-month figures. Companies that
   hold customer money can show inflated cash flow, and a headline that names
@@ -257,7 +278,7 @@ modified versions.
 python -m unittest discover -s tests
 ```
 
-The 62 tests run offline in about 2 seconds:
+The 67 tests run offline in about 3 seconds:
 
 - **Math checks:** a DCF round trip, IRR equal to the discount rate at the
   priced-in growth, the bootstrap's average block length, volatility scaling.

@@ -79,12 +79,12 @@ example a new "Investing" folder) and keep using it: results are saved in an
 | what you want | say something like |
 |---|---|
 | Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
-| Is it a good business? | "Does Costco have a moat?" |
+| Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" |
 | Is it expensive? | "What's priced into NVIDIA?" |
 | When to buy | "Where are the buy zones for Microsoft?" |
 | What could happen | "Simulate 10 years of owning Apple, $500 a month" |
 
-Slash commands work too: `/idea-scanner`, `/irreplaceable-test`,
+Slash commands work too: `/idea-scanner`, `/scorecard`,
 `/priced-in`, `/buy-zones`, `/time-machine`. Installed as a plugin they carry
 a prefix, e.g. `/investor-skills:priced-in`.
 
@@ -92,7 +92,7 @@ a prefix, e.g. `/investor-skills:priced-in`.
 chart, tables and sources (a link where Claude can publish pages, otherwise
 an HTML file in `investor/reports/`), and a chart image in `investor/charts/`.
 
-**For one stock, go in order:** scan → moat test → priced-in → buy zones →
+**For one stock, go in order:** scan → scorecard → priced-in → buy zones →
 time machine. Priced-In feeds Buy Zones and the Time Machine.
 
 **Good to know:** setup never needs repeating; the first market scan takes a

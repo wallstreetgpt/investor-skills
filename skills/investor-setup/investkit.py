@@ -331,30 +331,33 @@ def _yahoo_session():
     return _yahoo["crumb"]
 
 
+def _yahoo_crumb_json(base, ttl_hours):
+    """JSON from a Yahoo endpoint that needs the cookie + crumb, cached under the URL without the crumb."""
+    if os.environ.get("INVESTOR_OFFLINE"):
+        return fetch_json(base, "yahoo", ttl_hours)
+    key_path = os.path.join(cache_dir(), url_key(base))
+    if os.path.exists(key_path) and time.time() - os.path.getmtime(key_path) < ttl_hours * 3600:
+        return fetch_json(base, "yahoo", ttl_hours)
+    crumb = _yahoo_session()
+    body = _http(base + "&crumb=" + urllib.parse.quote(crumb), {"User-Agent": BROWSER_UA}, opener=_yahoo["opener"])
+    os.makedirs(cache_dir(), exist_ok=True)
+    with open(key_path, "wb") as f:
+        f.write(body)
+    record = os.environ.get("INVESTOR_RECORD")
+    if record:
+        os.makedirs(record, exist_ok=True)
+        with open(os.path.join(record, url_key(base)), "wb") as f:
+            f.write(body)
+    return json.loads(body.decode("utf-8"))
+
+
 def yahoo_quote(tickers, ttl_hours=1.0):
     """Quote snapshot (price, marketCap, sharesOutstanding, currency, financialCurrency, ...).
     Returns {TICKER: dict}. Needs Yahoo's cookie + crumb; returns {} if that fails."""
     syms = ",".join(yahoo_symbol(t) for t in tickers)
     base = "https://query2.finance.yahoo.com/v7/finance/quote?symbols=%s" % urllib.parse.quote(syms, safe=",")
     try:
-        if os.environ.get("INVESTOR_OFFLINE"):
-            data = fetch_json(base, "yahoo", ttl_hours)
-        else:
-            key_path = os.path.join(cache_dir(), url_key(base))
-            if os.path.exists(key_path) and time.time() - os.path.getmtime(key_path) < ttl_hours * 3600:
-                data = fetch_json(base, "yahoo", ttl_hours)
-            else:
-                crumb = _yahoo_session()
-                body = _http(base + "&crumb=" + urllib.parse.quote(crumb), {"User-Agent": BROWSER_UA}, opener=_yahoo["opener"])
-                os.makedirs(cache_dir(), exist_ok=True)
-                with open(key_path, "wb") as f:
-                    f.write(body)
-                record = os.environ.get("INVESTOR_RECORD")
-                if record:
-                    os.makedirs(record, exist_ok=True)
-                    with open(os.path.join(record, url_key(base)), "wb") as f:
-                        f.write(body)
-                data = json.loads(body.decode("utf-8"))
+        data = _yahoo_crumb_json(base, ttl_hours)
     except (InvestError, ValueError):
         return {}
     out = {}
@@ -364,6 +367,35 @@ def yahoo_quote(tickers, ttl_hours=1.0):
         if yahoo_symbol(t) in out:
             out[t.strip().upper()] = out[yahoo_symbol(t)]
     return out
+
+
+SUMMARY_MODULES = "summaryDetail,defaultKeyStatistics,financialData,earningsTrend,earningsHistory,calendarEvents"
+
+
+def yahoo_summary(ticker, modules=SUMMARY_MODULES, ttl_hours=6.0):
+    """Yahoo's per-company summary: consensus estimates (earningsTrend), beats (earningsHistory),
+    the next earnings date (calendarEvents) and key statistics. Values are unwrapped from
+    Yahoo's {"raw": x, "fmt": ...} form. Returns {module: dict}, or {} if Yahoo refuses."""
+    base = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=%s" % (
+        urllib.parse.quote(yahoo_symbol(ticker)), modules)
+    try:
+        data = _yahoo_crumb_json(base, ttl_hours)
+    except (InvestError, ValueError):
+        return {}
+    res = ((data.get("quoteSummary") or {}).get("result") or [None])[0]
+    return _unwrap(res) if res else {}
+
+
+def _unwrap(x):
+    if isinstance(x, dict):
+        if "raw" in x and set(x) <= {"raw", "fmt", "longFmt"}:
+            return x["raw"]
+        if not x or set(x) <= {"fmt", "longFmt"}:
+            return None
+        return {k: _unwrap(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_unwrap(v) for v in x]
+    return x
 
 
 def yahoo_quotes(tickers, chunk=400):
@@ -463,12 +495,14 @@ def sec_fulltext(query, forms="10-K", start=None, end=None):
     return fetch_json(url, "sec", ttl_hours=24)
 
 
-def sec_fulltext_hits(phrase, forms="8-K", start=None, end=None, max_pages=5, ttl_hours=12):
-    """Every filing (up to max_pages x 100) whose text contains the exact phrase.
-    Returns dicts: cik, name, form, filed, items, sic, url."""
+def sec_fulltext_hits(phrase, forms="8-K", start=None, end=None, max_pages=5, ttl_hours=12, cik=None):
+    """Every filing (up to max_pages x 100) whose text contains the exact phrase, from one
+    company when `cik` is given. Returns dicts: cik, name, form, filed, items, sic, url."""
     out, frm = [], 0
     for _ in range(max_pages):
         params = {"q": '"%s"' % phrase.strip('"'), "forms": forms}
+        if cik:
+            params["ciks"] = "%010d" % int(cik)
         if start and end:
             params.update({"dateRange": "custom", "startdt": start, "enddt": end})
         if frm:
@@ -507,6 +541,50 @@ def sec_frame_map(tags, period, unit="USD", taxonomy="us-gaap", ttl_hours=24 * 3
     return out
 
 
+# Phrases companies use in 8-Ks. Catalysts: kind, label, strength, phrases.
+CATALYSTS = [
+    ("guidance_up", "Raised guidance", 3, ["raises full-year guidance", "raised full-year guidance", "raises its full-year",
+                                           "raised its full-year", "raising full-year guidance", "raising its full-year",
+                                           "increases full-year guidance", "increased its full-year", "raises full year",
+                                           "raised full year", "raises its outlook", "raised its outlook", "raising its outlook",
+                                           "raises annual guidance", "raised its annual"]),
+    ("record", "Record results or backlog", 2, ["record backlog", "record revenue", "record quarterly revenue",
+                                               "record orders", "record bookings"]),
+    ("buyback", "New or larger buyback", 1, ["new share repurchase program", "new stock repurchase program",
+                                            "increase to its share repurchase", "increase in its share repurchase",
+                                            "additional share repurchase", "increased its share repurchase"]),
+    ("dividend", "Dividend raised", 1, ["increased its quarterly dividend", "increases quarterly dividend",
+                                       "raises quarterly dividend", "raised its quarterly dividend",
+                                       "increase in the quarterly dividend", "increase in its quarterly dividend"]),
+    ("contract", "Major contract", 1, ["awarded a contract", "contract award valued"]),
+]
+RED_FLAGS = [
+    # kind, label, hard (removes the name by default), phrases, item code that must be on the filing (or None)
+    ("restatement", "Restatement warning", True, ["Non-Reliance on Previously Issued"], "4.02"),
+    ("going_concern", "Going-concern doubt", True, ["substantial doubt about our ability to continue as a going concern",
+                                                    "substantial doubt about the Company's ability to continue as a going concern",
+                                                    "substantial doubt about its ability to continue as a going concern"], None),
+    ("bankruptcy", "Bankruptcy filing", True, ["Bankruptcy or Receivership"], "1.03"),
+    ("listing", "Listing deficiency notice", False, ["not in compliance with", "no longer in compliance with"], "3.01"),
+    ("guidance_down", "Lowered guidance", False, ["lowers full-year guidance", "lowered full-year guidance",
+                                                  "lowered its full-year", "reduces full-year guidance", "cuts full-year guidance",
+                                                  "lowers its outlook", "lowered its outlook", "lowered full year"], None),
+    ("auditor", "Auditor change", False, ["Changes in Registrant's Certifying Accountant"], "4.01"),
+    ("impairment", "Material impairment", False, ["Material Impairments"], "2.06"),
+    # wording that reports one, not risk-factor wording such as "could cause us to have material weaknesses"
+    ("weakness", "Material weakness reported", False, ["identified a material weakness", "identified material weaknesses",
+                                                       "material weakness was identified", "existence of a material weakness"],
+     None),
+]
+
+
+def own_words(hit):
+    """The 8-K itself or a press release (Exhibit 99), not contracts or other attached documents,
+    whose boilerplate mentions going concern, delisting and the like."""
+    t = hit.get("doc_type") or ""
+    return t in ("", "8-K", "8-K/A") or t.startswith("EX-99")
+
+
 def recent_8k_items(cik, days):
     """8-K filings of the last `days`: list of {filed, items, url}, newest first."""
     rec = sec_submissions(cik).get("filings", {}).get("recent", {})
@@ -514,7 +592,7 @@ def recent_8k_items(cik, days):
     out = []
     for i, form in enumerate(rec.get("form", [])):
         if form in ("8-K", "8-K/A") and rec["filingDate"][i] >= since:
-            out.append({"filed": rec["filingDate"][i], "items": [x for x in (rec.get("items") or [""] * (i + 1))[i].split(",") if x],
+            out.append({"filed": rec["filingDate"][i], "accn": rec["accessionNumber"][i], "items": [x for x in (rec.get("items") or [""] * (i + 1))[i].split(",") if x],
                         "url": filing_index_url(cik, rec["accessionNumber"][i]) + rec["primaryDocument"][i]})
     return out
 
@@ -542,7 +620,34 @@ def annual_report_text(cik):
     f = latest_filing(cik, ("10-K", "20-F", "40-F", "10-K/A"))
     if not f:
         return None, None
-    raw = fetch(f["doc_url"], "sec", ttl_hours=24 * 30).decode("utf-8", "replace")
+    return html_text(decode_filing(fetch(f["doc_url"], "sec", ttl_hours=24 * 30))), f
+
+
+def filing_exhibit(cik, accn, prefix="EX-99"):
+    """The first exhibit of a filing whose type starts with `prefix` (EX-99.1 is the press release
+    of an earnings 8-K): (plain text, url), or (None, None)."""
+    index = filing_index_url(cik, accn) + "%s-index.htm" % accn
+    page = fetch(index, "sec", ttl_hours=24 * 30).decode("utf-8", "replace")
+    for row in re.findall(r"(?is)<tr[^>]*>(.*?)</tr>", page):
+        cells = re.findall(r"(?is)<td[^>]*>(.*?)</td>", row)
+        link = re.search(r'(?i)href="([^"]+)"', row)
+        if link and any(re.sub(r"<[^>]+>|\s", "", c).upper().startswith(prefix) for c in cells):
+            href = link.group(1).replace("/ix?doc=", "")
+            url = href if href.startswith("http") else "https://www.sec.gov" + href
+            return html_text(decode_filing(fetch(url, "sec", ttl_hours=24 * 30))), url
+    return None, None
+
+
+def decode_filing(body):
+    """Filings are UTF-8, or Windows-1252 when older tools wrote them (curly quotes, bullets)."""
+    try:
+        return body.decode("utf-8")
+    except UnicodeDecodeError:
+        return body.decode("cp1252", "replace")
+
+
+def html_text(raw):
+    """Readable plain text from a filing's HTML: block tags become line breaks."""
     raw = re.sub(r"(?is)<ix:header>.*?</ix:header>", " ", raw)
     raw = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", raw)
     raw = re.sub(r"\s+", " ", raw)  # line breaks in the HTML source mean nothing; block tags do
@@ -551,7 +656,7 @@ def annual_report_text(cik):
     text = text.replace("\xa0", " ")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n\s*\n+", "\n", text)
-    return text, f
+    return text
 
 
 # ---------------------------------------------------------------- XBRL facts
@@ -592,6 +697,10 @@ TAGS = {
             "DepreciationPropertyPlantAndEquipment"],
     "equity": ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
                "EquityAttributableToOwnersOfParent", "Equity"],
+    "eps_diluted": ["EarningsPerShareDiluted", "EarningsPerShareBasicAndDiluted", "EarningsPerShareBasic",
+                    "DilutedEarningsLossPerShare"],
+    "buybacks": ["PaymentsForRepurchaseOfCommonStock", "PaymentsForRepurchaseOfEquity"],
+    "dividends_paid": ["PaymentsOfDividendsCommonStock", "PaymentsOfDividends", "DividendsPaid"],
     "shares_out": ["EntityCommonStockSharesOutstanding"],
     "shares_diluted": ["WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic",
                        "AdjustedWeightedAverageShares", "WeightedAverageShares"],
@@ -715,6 +824,61 @@ def ttm_value(facts, key, currency=None):
     return {"val": last["val"] + cur["val"] - p["val"], "end": cur["end"],
             "method": "TTM to %s (FY %s + %d-day YTD - prior YTD)" % (cur["end"], last["end"][:4], length),
             "sources": [last["accn"], cur.get("accn"), p.get("accn")], "tag": last["tag"]}
+
+
+def quarterly_series(facts, key, currency=None, units=None, derive_q4=True):
+    """Fiscal-quarter values for a concept: list of dicts {start, end, val, accn, filed, first_filed,
+    form, fy, fp, tag}, oldest first. Three-month figures as last filed (restatements win), with
+    `first_filed` the day the quarter was first reported. The fourth quarter, which annual reports
+    do not tag, is the fiscal year minus the nine months to the third quarter, both as first
+    reported so the two share a basis (a stock split in between would otherwise mix them)."""
+    tags = _tags(key)
+    currency = currency or reporting_currency(facts)
+    units = units or (currency, "USD")
+    largest = key == "revenue"
+    by_end = {}
+    for prio, tag in enumerate(tags):
+        entries, unit, _ = facts_unit_entries(facts, tag, units)
+        quarters, first, years, nines = {}, {}, {}, {}
+        for e in entries:
+            if "start" not in e:
+                continue
+            d = _days(e["start"], e["end"])
+            filed = e.get("filed", "")
+            if 80 <= d <= 100:
+                if e["end"] not in quarters or filed > quarters[e["end"]].get("filed", ""):
+                    quarters[e["end"]] = e
+                if e["end"] not in first or filed < first[e["end"]]:
+                    first[e["end"]] = filed
+            elif 350 <= d <= 380 or 260 <= d <= 285:
+                bucket, k = (years, e["end"]) if d >= 350 else (nines, (e["start"], e["end"]))
+                if k not in bucket or filed < bucket[k].get("filed", ""):
+                    bucket[k] = e
+        rows = {end: dict(start=e["start"], end=end, val=e["val"], accn=e.get("accn"), filed=e.get("filed", ""),
+                          first_filed=first[end], form=e.get("form"), fy=e.get("fy"), fp=e.get("fp"), tag=tag, prio=prio)
+                for end, e in quarters.items()}
+        if derive_q4:
+            for end, fy in years.items():
+                if end in rows:
+                    continue
+                nine = [n for (s, _), n in nines.items() if s == fy["start"]]
+                if nine:
+                    n = max(nine, key=lambda x: x["end"])
+                    rows[end] = dict(start=n["end"], end=end, val=fy["val"] - n["val"], accn=fy.get("accn"),
+                                     filed=fy.get("filed", ""), first_filed=fy.get("filed", ""), form=fy.get("form"),
+                                     fy=fy.get("fy"), fp="Q4", tag=tag, prio=prio, derived=True)
+        for end, r in rows.items():
+            cur = by_end.get(end)
+            if cur is None or (largest and r["val"] > cur["val"]) or (not largest and prio < cur["prio"]):
+                by_end[end] = r
+    out = sorted(by_end.values(), key=lambda r: r["end"])
+    clean = []
+    for r in out:  # drop quarters ending within 60 days of the next (mixed tags, restated periods)
+        if clean and _days(clean[-1]["end"], r["end"]) < 60:
+            clean[-1] = r if r["prio"] < clean[-1]["prio"] else clean[-1]
+            continue
+        clean.append(r)
+    return clean
 
 
 def latest_instant(facts, key, currency=None, on_or_before=None):

@@ -63,8 +63,8 @@ def lens_rule(lens, days):
     return LENS_RULE[lens].replace("{days}", str(days))
 
 
-NEXT_STEP = {"quality": "irreplaceable-test", "gap": "priced-in", "fallen": "buy-zones",
-             "accelerating": "irreplaceable-test", "catalysts": "priced-in", "all": "priced-in"}
+NEXT_STEP = {"quality": "scorecard", "gap": "priced-in", "fallen": "buy-zones",
+             "accelerating": "scorecard", "catalysts": "priced-in", "all": "priced-in"}
 
 # ---- what to read from SEC frames
 REVENUE = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues",
@@ -77,41 +77,10 @@ EQUITY = ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableT
           "PartnersCapital", "MembersEquity"]
 STI = ik.TAGS["short_investments"]
 
-# ---- newsflow: phrases companies use in 8-Ks
-CATALYSTS = [
-    ("guidance_up", "Raised guidance", 3, ["raises full-year guidance", "raised full-year guidance", "raises its full-year",
-                                           "raised its full-year", "raising full-year guidance", "raising its full-year",
-                                           "increases full-year guidance", "increased its full-year", "raises full year",
-                                           "raised full year", "raises its outlook", "raised its outlook", "raising its outlook",
-                                           "raises annual guidance", "raised its annual"]),
-    ("record", "Record results or backlog", 2, ["record backlog", "record revenue", "record quarterly revenue",
-                                               "record orders", "record bookings"]),
-    ("buyback", "New or larger buyback", 1, ["new share repurchase program", "new stock repurchase program",
-                                            "increase to its share repurchase", "increase in its share repurchase",
-                                            "additional share repurchase", "increased its share repurchase"]),
-    ("dividend", "Dividend raised", 1, ["increased its quarterly dividend", "increases quarterly dividend",
-                                       "raises quarterly dividend", "raised its quarterly dividend",
-                                       "increase in the quarterly dividend", "increase in its quarterly dividend"]),
-    ("contract", "Major contract", 1, ["awarded a contract", "contract award valued"]),
-]
-RED_FLAGS = [
-    # kind, label, hard (removes the name by default), phrases, item code that must be on the filing (or None)
-    ("restatement", "Restatement warning", True, ["Non-Reliance on Previously Issued"], "4.02"),
-    ("going_concern", "Going-concern doubt", True, ["substantial doubt about our ability to continue as a going concern",
-                                                    "substantial doubt about the Company's ability to continue as a going concern",
-                                                    "substantial doubt about its ability to continue as a going concern"], None),
-    ("bankruptcy", "Bankruptcy filing", True, ["Bankruptcy or Receivership"], "1.03"),
-    ("listing", "Listing deficiency notice", False, ["not in compliance with", "no longer in compliance with"], "3.01"),
-    ("guidance_down", "Lowered guidance", False, ["lowers full-year guidance", "lowered full-year guidance",
-                                                  "lowered its full-year", "reduces full-year guidance", "cuts full-year guidance",
-                                                  "lowers its outlook", "lowered its outlook", "lowered full year"], None),
-    ("auditor", "Auditor change", False, ["Changes in Registrant's Certifying Accountant"], "4.01"),
-    ("impairment", "Material impairment", False, ["Material Impairments"], "2.06"),
-    # wording that reports one, not risk-factor wording such as "could cause us to have material weaknesses"
-    ("weakness", "Material weakness reported", False, ["identified a material weakness", "identified material weaknesses",
-                                                       "material weakness was identified", "existence of a material weakness"],
-     None),
-]
+# ---- newsflow: the 8-K phrase library lives in the core (the scorecard uses it too)
+CATALYSTS = ik.CATALYSTS
+RED_FLAGS = ik.RED_FLAGS
+own_words = ik.own_words
 ITEM_LABELS = {"1.01": "material agreement", "1.02": "agreement ended", "1.03": "bankruptcy", "2.01": "deal completed",
                "2.02": "results", "2.03": "new debt", "2.05": "restructuring", "2.06": "impairment",
                "3.01": "delisting notice", "3.02": "share sale", "4.01": "auditor change", "4.02": "restatement",
@@ -410,13 +379,6 @@ def combined(rows):
 
 
 # ---------------------------------------------------------------- newsflow
-
-def own_words(hit):
-    """The 8-K itself or a press release (Exhibit 99), not contracts or other attached documents,
-    whose boilerplate mentions going concern, delisting and the like."""
-    t = hit.get("doc_type") or ""
-    return t in ("", "8-K", "8-K/A") or t.startswith("EX-99")
-
 
 def scan_catalysts(days, ciks):
     """Positive catalyst 8-Ks of the last `days`, for companies in `ciks`: {cik: [hits]}."""
@@ -929,7 +891,7 @@ def report(scan):
         "Fundamentals come from SEC XBRL frames, which line each company's fiscal year up with a calendar year: "
         "calendar %d for the annual numbers, %s for the latest quarter. A company whose fiscal year ended in early %d "
         "counts toward %d." % (scan["year"], scan["quarter"], scan["year"] + 1, scan["year"]),
-        "Return on capital is after-tax operating profit over equity plus debt minus cash, as in the Irreplaceable Test. "
+        "Return on capital is after-tax operating profit over equity plus debt minus cash, as in the Scorecard. "
         "Free cash flow is operating cash flow minus capital spending and stock compensation. The growth the price "
         "assumes uses Priced-In's reverse DCF with a 9% required return, on the last full year's free cash flow; "
         "/priced-in redoes it on the trailing twelve months.",
