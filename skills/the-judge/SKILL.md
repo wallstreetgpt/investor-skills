@@ -1,7 +1,7 @@
 ---
-name: scorecard
+name: the-judge
 description: >-
-  Attractiveness Scorecard. Scores a stock 0-100 on five weighted pillars,
+  The Judge, the Attractiveness Scorecard. Scores a stock 0-100 on five weighted pillars,
   each from stated rules: operating quality (return on capital, margins, cash
   conversion, balance sheet), recent trend (the latest quarters against a
   year earlier), forward growth (consensus, the company's own guidance and
@@ -13,11 +13,11 @@ description: >-
   confidence level. Use when the user asks "score X", "scorecard", "is X
   attractive", "rate this stock", "is it a good business", "does X have a
   moat", "quality check", "should I look at X", "full picture on X", or on
-  names /idea-scanner surfaces.
+  names /the-scout surfaces.
 argument-hint: "TICKER [--peers A,B,C]"
 ---
 
-# Attractiveness Scorecard
+# The Judge: Attractiveness Scorecard
 
 `${CLAUDE_SKILL_DIR}` is this skill's folder. Run with `python` (Windows) or
 `python3` (macOS/Linux); if one is not found, use the other. Run from the
@@ -106,9 +106,9 @@ score is built" table. Missing inputs are left out, never guessed.
 The score, band and confidence; the strongest and weakest pillar with the
 number behind each; the one or two things that would change the view. Keep
 the chat short and let the report carry the detail. Point to the image for
-video, `investor/charts/<TICKER>-scorecard.svg`. Then suggest /priced-in
-for the full expectations picture, /buy-zones for entry levels and
-/time-machine for the range of outcomes.
+video, `investor/charts/<TICKER>-scorecard.svg`. Then suggest /the-mind-reader
+for the full expectations picture, /the-sniper for entry levels and
+/the-time-traveller for the range of outcomes.
 
 ## Show the report
 

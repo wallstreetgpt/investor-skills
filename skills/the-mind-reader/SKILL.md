@@ -1,7 +1,7 @@
 ---
-name: priced-in
+name: the-mind-reader
 description: >-
-  Priced-In Calculator. Works out what growth a stock's price already assumes
+  The Mind Reader, the Priced-In Calculator. Works out what growth a stock's price already assumes
   (a reverse DCF from SEC filings), then checks it against reality: the
   company's own track record and the base rate of how fast every US company
   its size actually grew over a decade. Turns growth scenarios (typical peer,
@@ -9,11 +9,11 @@ description: >-
   would earn from today's price. Use when the user asks "what's priced in",
   "what does the market expect", "is X expensive", "what growth does the
   price assume", "reverse DCF", "expectations", "is it overvalued", or before
-  /time-machine and /buy-zones (both read its results).
+  /the-time-traveller and /the-sniper (both read its results).
 argument-hint: "TICKER [--discount 0.09] [--price P]"
 ---
 
-# Priced-In Calculator
+# The Mind Reader: Priced-In Calculator
 
 Instead of guessing a fair value, take the market's price as the answer and
 solve for the question: how fast must this business grow to be worth it?
@@ -81,8 +81,8 @@ Lead with the headline sentence, then:
 - every line under "Check:" (stale data, financial company, share class).
 
 The chart image for video is `investor/charts/<TICKER>-priced-in.svg` (open it in
-a browser), and suggest `/time-machine TICKER` (it uses these scenarios) and
-`/buy-zones TICKER` (it shows the growth priced in at each support zone).
+a browser), and suggest `/the-time-traveller TICKER` (it uses these scenarios) and
+`/the-sniper TICKER` (it shows the growth priced in at each support zone).
 
 ## Show the report
 

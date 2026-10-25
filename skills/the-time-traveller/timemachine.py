@@ -285,7 +285,7 @@ def render(ticker, args, used, hs, hw, results, doc):
         else:
             L.append("History is short, so the whole record's volatility is used as is.")
     if results[0]["annual_return"] is not None:
-        src = "Priced-In's scenarios" if doc else "the returns below"
+        src = "The Mind Reader's scenarios" if doc else "the returns below"
         L.append("Expected returns come from %s, not from the past. %s is set to %s a year."
                  % (src, args.benchmark, ik.pct(args.market_return)))
     L.append("")
@@ -493,10 +493,10 @@ def report(ticker, args, used, hs, hw, results, doc):
     links = [("Prices and dividends: Yahoo Finance %s" % ticker, "https://finance.yahoo.com/quote/%s" % ik.yahoo_symbol(ticker)),
              ("Benchmark: Yahoo Finance %s" % args.benchmark, "https://finance.yahoo.com/quote/%s" % args.benchmark)]
     if doc:
-        links.append(("Scenarios from the Priced-In report of %s" % doc.get("updated", ""), None))
+        links.append(("Scenarios from The Mind Reader's report of %s" % doc.get("updated", ""), None))
     body.append(ik.h_section("Sources", ik.h_sources(links)))
     name = (doc or {}).get("name") or ticker
-    return ik.report_page("%s Time Machine" % ticker, ["Time Machine", ticker, ik.today().isoformat()], name, thesis,
+    return ik.report_page("%s Time Machine" % ticker, ["The Time Traveller · Time Machine", ticker, ik.today().isoformat()], name, thesis,
                           "\n".join(body), "%s simulated decades for %s against the S&P 500."
                           % ("{:,}".format(args.paths), ticker))
 
@@ -532,7 +532,7 @@ def main(argv=None):
             args.market_return = doc.get("discount", args.market_return)
         rs, rb, used, meta = paired_returns(ticker, args.benchmark)
         if len(rs) < MIN_MONTHS:
-            raise ik.InvestError("%s has only %d months of prices; the Time Machine needs at least %d."
+            raise ik.InvestError("%s has only %d months of prices; The Time Traveller needs at least %d."
                                  % (ticker, len(rs), MIN_MONTHS))
         scen, doc = load_scenarios(ticker, args, rs)
         if not scen:

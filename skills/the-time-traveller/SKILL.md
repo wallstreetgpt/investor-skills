@@ -1,10 +1,10 @@
 ---
-name: time-machine
+name: the-time-traveller
 description: >-
-  Time Machine. A Monte Carlo of the next 10 years for one stock against the
+  The Time Traveller, the Time Machine. A Monte Carlo of the next 10 years for one stock against the
   S&P 500: 10,000 simulated futures built from the stock's real monthly
   returns (paired with the market's, drawn in blocks so crashes stay
-  clustered), centred on growth scenarios from /priced-in instead of on the
+  clustered), centred on growth scenarios from /the-mind-reader instead of on the
   past. Shows the range of outcomes, odds of losing money, odds of beating
   the S&P, the worst fall you would likely sit through, and every real
   10-year window from its own history. Lump sum or monthly investing. Use
@@ -14,7 +14,7 @@ description: >-
 argument-hint: "TICKER [--monthly 500] [--years 10]"
 ---
 
-# Time Machine
+# The Time Traveller: Time Machine
 
 `${CLAUDE_SKILL_DIR}` is this skill's folder. Run with `python` (Windows) or
 `python3` (macOS/Linux); if one is not found, use the other. Run from the
@@ -36,7 +36,7 @@ python "${CLAUDE_SKILL_DIR}/timemachine.py" AAPL --scenario history      # raw h
 python "${CLAUDE_SKILL_DIR}/timemachine.py" NVDA --vol full              # use the whole record's volatility
 ```
 
-Run `/priced-in TICKER` first if it has not been run today: the Time Machine
+Run `/the-mind-reader TICKER` first if it has not been run today: The Time Traveller
 reads its scenarios from `investor/<TICKER>.json`. Without them it compares
 "earns the market's 9%" with "repeats its own past (hindsight)".
 
@@ -53,7 +53,7 @@ reads its scenarios from `investor/<TICKER>.json`. Without them it compares
   turns this off.
 - **The center does not come from history.** A plain bootstrap of a past
   winner just promises its past forever. Each scenario shifts the average
-  (log) yearly growth to the scenario's return from /priced-in; the typical
+  (log) yearly growth to the scenario's return from /the-mind-reader; the typical
   (median) future lands slightly above it because crashes skew the downside.
   The S&P is set to the same 9% the discount rate assumes.
 - All scenarios run on the same 10,000 random paths, so differences between

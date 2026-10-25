@@ -19,7 +19,7 @@ that evidence. Then three honesty checks for every zone:
   * the odds price even gets there within 6 and 12 months, from 10,000
     bootstrapped paths of the stock's own last 2 years of daily moves,
     plus how often a fall that deep happened in its real last 5 years
-  * the valuation at that price, if /priced-in has run: the growth the price
+  * the valuation at that price, if /the-mind-reader has run: the growth the price
     would assume there, and the price where it only assumes what a
     top-quarter company its size has achieved (the valuation floor). A zone
     that is strong on the chart AND at or under that floor is a DOUBLE FLOOR.
@@ -436,7 +436,7 @@ def render(ticker, a, args):
         L.append("")
     v = a["val"]
     if v:
-        L.append("Valuation (from /priced-in, %s)" % v["asof"])
+        L.append("Valuation (from /the-mind-reader, %s)" % v["asof"])
         if v.get("now_growth") is not None:
             L.append("  Today's price assumes %s growth a year." % ik.pct(v["now_growth"]))
         if v.get("floor_price"):
@@ -453,7 +453,7 @@ def render(ticker, a, args):
         else:
             L.append("  No chart zone reaches the valuation floor: on valuation alone, none of these is cheap.")
     else:
-        L.append("Run /priced-in %s first to see the growth priced in at each zone and the valuation floor." % ticker)
+        L.append("Run /the-mind-reader %s first to see the growth priced in at each zone and the valuation floor." % ticker)
     if a["ceilings"]:
         L.append("")
         L.append("Ceilings above: " + "   ".join("%s-%s (+%s, strength %d)" % (
@@ -591,7 +591,7 @@ def report(ticker, a, args):
                      "%s-%s" % (ik.money(z["lo"]), ik.money(z["hi"])), ik.pct(z["drop"], 0), str(z["score"]),
                      "%d / %d" % (r["held"], r["broke"]) + (" (+%d open)" % r["open"] if r["open"] else ""),
                      "%s / %s" % (ik.pct(z.get("odds6"), 0), ik.pct(z.get("odds12"), 0)), ik.pct(z.get("hist12"), 0),
-                     (ik.pct(z["growth"]) + (" (double floor)" if z.get("double") else "")) if z.get("growth") is not None else "run Priced-In"])
+                     (ik.pct(z["growth"]) + (" (double floor)" if z.get("double") else "")) if z.get("growth") is not None else "run /the-mind-reader"])
     if rows:
         body.append(ik.h_section("The buy-zone ladder", ik.h_table(
             ["Zone", "Range", "Below", "Strength", "Held / broke", "Reached in 6 / 12 months", "Happened before",
@@ -613,7 +613,7 @@ def report(ticker, a, args):
                for i, z in enumerate(a["ceilings"], 1)]
         body.append(ik.h_section("Valuation and the averages", ik.h_kv([val, ma])))
     else:
-        body.append(ik.h_callout("Add the valuation half", ["Run /priced-in %s first to see the growth priced in at each "
+        body.append(ik.h_callout("Add the valuation half", ["Run /the-mind-reader %s first to see the growth priced in at each "
                                                             "zone and the valuation floor." % ticker]))
     if ladder:
         zl = ladder[-1]
@@ -633,9 +633,9 @@ def report(ticker, a, args):
         "Prices are split-adjusted, not dividend-adjusted, because levels are traded prices.")))
     links = [("Prices: Yahoo Finance %s" % ticker, "https://finance.yahoo.com/quote/%s" % ik.yahoo_symbol(ticker))]
     if doc:
-        links.append(("Valuation from the Priced-In report of %s" % doc.get("updated", ""), None))
+        links.append(("Valuation from The Mind Reader's report of %s" % doc.get("updated", ""), None))
     body.append(ik.h_section("Sources", ik.h_sources(links)))
-    return ik.report_page("%s Buy Zones" % ticker, ["Buy Zones", ticker, a["asof"]], name, thesis, "\n".join(body),
+    return ik.report_page("%s Buy Zones" % ticker, ["The Sniper · Buy Zones", ticker, a["asof"]], name, thesis, "\n".join(body),
                           "Support zones for %s with their records, the odds of reaching them and the valuation there."
                           % ticker)
 

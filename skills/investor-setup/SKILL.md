@@ -59,7 +59,7 @@ reached, it is usually a firewall, a VPN or a work network.
 
 ## 4. Download the market data now (optional, 1-2 minutes)
 
-The Idea Scanner reads about 100 SEC data files the first time it runs.
+The Scout reads about 100 SEC data files the first time it runs.
 Offer to fetch them now so the first scan is instant later:
 
 ```bash
@@ -76,24 +76,26 @@ example a new "Investing" folder) and keep using it: results are saved in an
 
 **Just ask.** Plain English is enough; Claude picks the right skill:
 
-| what you want | say something like |
-|---|---|
-| Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
-| Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" |
-| Is it expensive? | "What's priced into NVIDIA?" |
-| When to buy | "Where are the buy zones for Microsoft?" |
-| What could happen | "Simulate 10 years of owning Apple, $500 a month" |
+| what you want | say something like | who answers |
+|---|---|---|
+| Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" | The Scout |
+| Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" | The Judge |
+| Is it expensive? | "What's priced into NVIDIA?" | The Mind Reader |
+| When to buy | "Where are the buy zones for Microsoft?" | The Sniper |
+| What could happen | "Simulate 10 years of owning Apple, $500 a month" | The Time Traveller |
 
-Slash commands work too: `/idea-scanner`, `/scorecard`,
-`/priced-in`, `/buy-zones`, `/time-machine`. Installed as a plugin they carry
-a prefix, e.g. `/investor-skills:priced-in`.
+Slash commands work too: `/the-scout`, `/the-judge`,
+`/the-mind-reader`, `/the-sniper`, `/the-time-traveller`. Installed as a plugin they carry
+a prefix, e.g. `/investor-skills:the-mind-reader`.
 
 **What comes back.** A short answer in chat, plus a report page with the
 chart, tables and sources (a link where Claude can publish pages, otherwise
 an HTML file in `investor/reports/`), and a chart image in `investor/charts/`.
 
-**For one stock, go in order:** scan → scorecard → priced-in → buy zones →
-time machine. Priced-In feeds Buy Zones and the Time Machine.
+**Meet the crew, in order for one stock:** The Scout finds it → The Judge
+scores it → The Mind Reader shows what the price assumes → The Sniper finds
+the entry → The Time Traveller shows what could happen. The Mind Reader
+feeds The Sniper and The Time Traveller.
 
 **Good to know:** setup never needs repeating; the first market scan takes a
 minute or two unless the data was downloaded in step 4; data refreshes on

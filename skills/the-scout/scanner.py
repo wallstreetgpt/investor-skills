@@ -63,8 +63,8 @@ def lens_rule(lens, days):
     return LENS_RULE[lens].replace("{days}", str(days))
 
 
-NEXT_STEP = {"quality": "scorecard", "gap": "priced-in", "fallen": "buy-zones",
-             "accelerating": "scorecard", "catalysts": "priced-in", "all": "priced-in"}
+NEXT_STEP = {"quality": "the-judge", "gap": "the-mind-reader", "fallen": "the-sniper",
+             "accelerating": "the-judge", "catalysts": "the-mind-reader", "all": "the-mind-reader"}
 
 # ---- what to read from SEC frames
 REVENUE = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues",
@@ -891,10 +891,10 @@ def report(scan):
         "Fundamentals come from SEC XBRL frames, which line each company's fiscal year up with a calendar year: "
         "calendar %d for the annual numbers, %s for the latest quarter. A company whose fiscal year ended in early %d "
         "counts toward %d." % (scan["year"], scan["quarter"], scan["year"] + 1, scan["year"]),
-        "Return on capital is after-tax operating profit over equity plus debt minus cash, as in the Scorecard. "
+        "Return on capital is after-tax operating profit over equity plus debt minus cash, as in The Judge (the scorecard). "
         "Free cash flow is operating cash flow minus capital spending and stock compensation. The growth the price "
-        "assumes uses Priced-In's reverse DCF with a 9% required return, on the last full year's free cash flow; "
-        "/priced-in redoes it on the trailing twelve months.",
+        "assumes uses The Mind Reader's reverse DCF with a 9% required return, on the last full year's free cash flow; "
+        "/the-mind-reader redoes it on the trailing twelve months.",
         "Newsflow: SEC full-text search over 8-K filings for fixed phrases (raised guidance, record backlog, new buybacks, "
         "dividend increases, contract awards; and red flags such as restatements, going-concern doubt, lowered guidance), "
         "plus Yahoo headlines. A phrase match shows what a company said, not whether it matters.",
@@ -903,7 +903,7 @@ def report(scan):
             ("SEC full-text search", "https://efts.sec.gov/LATEST/search-index"),
             ("Prices and headlines: Yahoo Finance", None)]
     body.append(ik.h_section("Sources", ik.h_sources(srcs)))
-    page = ik.report_page("Idea Scanner %s" % title_bits.replace('"', ""), ["Idea Scanner", LENS_NAME[lens], ik.today().isoformat()],
+    page = ik.report_page("Idea Scanner %s" % title_bits.replace('"', ""), ["The Scout · Idea Scanner", LENS_NAME[lens], ik.today().isoformat()],
                           "Ideas: " + title_bits, thesis, "\n".join(body),
                           "A scan of every US-listed company through stated investor lenses, with 8-K newsflow.")
     return page.replace("<style>", EXTRA_CSS + "\n<style>", 1).replace("</script>\n", "</script>\n<script>%s</script>\n" % TABLE_JS, 1)
@@ -1004,7 +1004,7 @@ def news_report(rows, days):
         "words are a simple keyword tag, not a judgment.")))
     thesis = "%d positive catalyst%s and %d red flag%s across %d companies." % (
         n_c, "" if n_c == 1 else "s", n_f, "" if n_f == 1 else "s", len(rows))
-    return ik.report_page("Newsflow Watchlist", ["Newsflow", ik.today().isoformat()], "Newsflow: " + ", ".join(
+    return ik.report_page("Newsflow Watchlist", ["The Scout · Newsflow", ik.today().isoformat()], "Newsflow: " + ", ".join(
         r["ticker"] for r in rows[:8]) + ("..." if len(rows) > 8 else ""), thesis, "\n".join(body),
         "Catalysts, red flags and headlines for a watchlist.")
 

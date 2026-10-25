@@ -2,7 +2,7 @@ import unittest
 
 from _helpers import Offline, ik, load, run
 
-bz = load("buy-zones", "buyzones")
+bz = load("the-sniper", "buyzones")
 
 
 def series(closes, spread=0.01):

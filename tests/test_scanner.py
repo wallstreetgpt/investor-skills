@@ -6,7 +6,7 @@ from unittest import mock
 
 from _helpers import Offline, ik, load
 
-sc = load("idea-scanner", "scanner")
+sc = load("the-scout", "scanner")
 
 YEAR, Q = 2025, (2026, 2)
 REV = 1e9

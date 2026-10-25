@@ -4,7 +4,7 @@ import unittest
 
 from _helpers import Offline, ik, load, run
 
-sc = load("scorecard", "scorecard")
+sc = load("the-judge", "scorecard")
 
 
 def facts_with(entries_by_tag, unit="USD"):

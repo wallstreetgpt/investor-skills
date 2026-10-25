@@ -599,7 +599,7 @@ def report(inp, model, br, tr, scen, args):
     links.append(("Price: Yahoo Finance %s" % t, "https://finance.yahoo.com/quote/%s" % ik.yahoo_symbol(t)))
     body.append(ik.h_section("Sources", ik.h_sources(links)))
     thesis = ik.esc(headline(inp, model, br, tr, args))
-    return ik.report_page("%s Priced-In" % t, ["Priced-In", t, inp["price_asof"]], inp["name"], thesis, "\n".join(body),
+    return ik.report_page("%s Priced-In" % t, ["The Mind Reader · Priced-In", t, inp["price_asof"]], inp["name"], thesis, "\n".join(body),
                           "The growth %s's price assumes, against its own record and every US company its size." % t)
 
 

@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import investkit as ik  # noqa: E402
 
-SKILLS = ["idea-scanner", "scorecard", "priced-in", "buy-zones", "time-machine"]
+SKILLS = ["the-scout", "the-judge", "the-mind-reader", "the-sniper", "the-time-traveller"]
 
 
 def installed():
@@ -26,12 +26,12 @@ def installed():
 def warm():
     parent = os.path.dirname(HERE)
     jobs = []
-    if os.path.isfile(os.path.join(parent, "idea-scanner", "scanner.py")):
-        jobs.append(("whole-market data for the Idea Scanner",
-                     [sys.executable, os.path.join(parent, "idea-scanner", "scanner.py"), "--no-write", "--no-headlines"]))
-    if os.path.isfile(os.path.join(parent, "priced-in", "pricedin.py")):
-        jobs.append(("growth base rates for Priced-In",
-                     [sys.executable, os.path.join(parent, "priced-in", "pricedin.py"), "AAPL", "--no-write"]))
+    if os.path.isfile(os.path.join(parent, "the-scout", "scanner.py")):
+        jobs.append(("whole-market data for The Scout",
+                     [sys.executable, os.path.join(parent, "the-scout", "scanner.py"), "--no-write", "--no-headlines"]))
+    if os.path.isfile(os.path.join(parent, "the-mind-reader", "pricedin.py")):
+        jobs.append(("growth base rates for The Mind Reader",
+                     [sys.executable, os.path.join(parent, "the-mind-reader", "pricedin.py"), "AAPL", "--no-write"]))
     if not jobs:
         print("No skills found next to this one to warm up.")
         return 1

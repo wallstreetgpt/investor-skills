@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from _helpers import Offline, ik, load, run
 
-tm = load("time-machine", "timemachine")
+tm = load("the-time-traveller", "timemachine")
 
 
 def args(**kw):

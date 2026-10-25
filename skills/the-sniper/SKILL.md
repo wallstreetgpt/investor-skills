@@ -1,12 +1,12 @@
 ---
-name: buy-zones
+name: the-sniper
 description: >-
-  Buy Zone Finder. Finds where a stock has support (price bands where buyers
+  The Sniper, the Buy Zone Finder. Finds where a stock has support (price bands where buyers
   stepped in before) by rules, not by eye: weekly swing lows, old ceilings
   that became floors, volume shelves and the 200-day and 200-week averages,
   merged into zones scored 0-100. For each zone: its record (held or broke
   each time it was tested), the odds price even gets there in 6 and 12
-  months, and, with /priced-in, the growth the market would assume at that
+  months, and, with /the-mind-reader, the growth the market would assume at that
   price. A zone that is strong on the chart and cheap on valuation is a
   DOUBLE FLOOR. Use when the user asks "where should I buy", "good entry",
   "entry level", "support and resistance", "buy the dip where", "what price
@@ -14,7 +14,7 @@ description: >-
 argument-hint: "TICKER"
 ---
 
-# Buy Zone Finder
+# The Sniper: Buy Zone Finder
 
 `${CLAUDE_SKILL_DIR}` is this skill's folder. Run with `python` (Windows) or
 `python3` (macOS/Linux); if one is not found, use the other. Run from the
@@ -33,7 +33,7 @@ python "${CLAUDE_SKILL_DIR}/buyzones.py" KO --max-drop 0.30 --zones 4
 python "${CLAUDE_SKILL_DIR}/buyzones.py" TSM --min-score 40
 ```
 
-Run `/priced-in TICKER` first for the valuation half (growth priced in at each
+Run `/the-mind-reader TICKER` first for the valuation half (growth priced in at each
 zone, the valuation floor, double floors). Without it the chart half still works.
 
 ## How it works (say this plainly when asked)
@@ -52,7 +52,7 @@ zone, the valuation floor, double floors). Without it the chart half still works
   held = closed 5% above it within 60 trading days, broke = closed 2% below.
 - **Odds of getting there**: 10,000 paths built from the stock's own last 2
   years of daily moves (in blocks), centred on the same 9% a year as
-  /priced-in; plus how often a fall that deep within a year really happened
+  /the-mind-reader; plus how often a fall that deep within a year really happened
   in the last 5 years. The two should roughly agree; if not, say so.
 - **Valuation**: the growth the price would assume at each zone; the
   *valuation floor* is the price where the market would only be assuming

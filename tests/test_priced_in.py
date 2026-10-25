@@ -6,7 +6,7 @@ import unittest
 
 from _helpers import Offline, ik, load, run
 
-pricedin = load("priced-in", "pricedin")
+pricedin = load("the-mind-reader", "pricedin")
 
 
 class LiveFixtureRun(unittest.TestCase):

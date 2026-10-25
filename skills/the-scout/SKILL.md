@@ -1,7 +1,7 @@
 ---
-name: idea-scanner
+name: the-scout
 description: >-
-  Idea Scanner. Scans every US-listed company that files with the SEC
+  The Scout, the Idea Scanner. Scans every US-listed company that files with the SEC
   (about 1,800 worth $1B or more) through stated investor lenses: quality
   compounders, the expectations gap (the price assumes less growth than the
   company has been delivering), fallen quality, accelerating growth and fresh
@@ -15,7 +15,7 @@ description: >-
 argument-hint: "[--lens all|quality|gap|fallen|accelerating|catalysts] [--theme \"phrase\"] | news TICKERS"
 ---
 
-# Idea Scanner
+# The Scout: Idea Scanner
 
 `${CLAUDE_SKILL_DIR}` is this skill's folder. Run with `python` (Windows) or
 `python3` (macOS/Linux); if one is not found, use the other. Run from the
@@ -45,7 +45,7 @@ later runs take seconds (cached). Tell the user that before the first run.
 | lens | the idea | the rule |
 |---|---|---|
 | `quality` | Quality compounders | Return on capital 15%+ in each of 3 years, gross margin within 3 points of its 3-year average, revenue +8% a year or more, shares +2% a year or less |
-| `gap` | Expectations gap | The growth the price assumes (Priced-In's reverse DCF, 9% required return) is 5+ points below the company's own revenue growth (the lower of its 3-year and last-year rates, counted at 40% at most); positive free cash flow 2 years running; return on capital 10%+; no acquisitions |
+| `gap` | Expectations gap | The growth the price assumes (The Mind Reader's reverse DCF, 9% required return) is 5+ points below the company's own revenue growth (the lower of its 3-year and last-year rates, counted at 40% at most); positive free cash flow 2 years running; return on capital 10%+; no acquisitions |
 | `fallen` | Fallen quality | Return on capital 12%+ in each of 3 years, steady gross margin, positive free cash flow, and 25%+ below its 52-week high |
 | `accelerating` | Accelerating growth | Latest quarter's revenue +15% on a year ago and 5+ points faster than a year earlier (which was already positive), margin holding, positive free cash flow, no acquisition |
 | `catalysts` | Fresh catalysts | A positive 8-K in the last 7 days (raised guidance, record results or backlog, new or larger buyback, dividend increase, major contract), positive operating cash flow, return on capital 10%+ |
@@ -93,8 +93,8 @@ Every run writes a finished report page, `investor/reports/scan-<lens>.html`
    fall looks like a temporary scare or a broken thesis, labelled as your
    reading.
 4. The next step for each name, as the report's "Next step" column suggests:
-   `/scorecard` (the full weighed picture), `/priced-in` (what the price
-   assumes on trailing numbers) or `/buy-zones`.
+   `/the-judge` (the full weighed picture), `/the-mind-reader` (what the price
+   assumes on trailing numbers) or `/the-sniper`.
 
 ## Honesty rules
 
@@ -103,7 +103,7 @@ Every run writes a finished report page, `investor/reports/scan-<lens>.html`
   you one by name.
 - A screen is a starting point, not a pick. Never call a result a buy.
 - The fundamentals are the last full calendar year in SEC's frames (a fiscal
-  year ending early next year counts toward it). /priced-in redoes the
+  year ending early next year counts toward it). /the-mind-reader redoes the
   valuation on trailing-twelve-month numbers, so the two can differ.
 - Frames carry what companies tagged; a bad tag can push a company in or out.
   Companies that hold customer money (payment apps, marketplaces with float)

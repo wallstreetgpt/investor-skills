@@ -1,25 +1,27 @@
 # Investor Skills
 
-Five Claude skills for long-term investors. Scan the whole market for ideas
-and their news, score how attractive a stock is on five weighted pillars, see
-what its price already assumes, find where buyers have stepped in before, and
-simulate 10,000 possible next decades.
+Five research bots for long-term investors, as Claude skills. The Scout scans
+the whole market for ideas and their news, The Judge scores how attractive a
+stock is, The Mind Reader shows what its price already assumes, The Sniper
+finds where buyers have stepped in before, and The Time Traveller simulates
+10,000 possible next decades.
 
 Plain Python with nothing to install and no API keys. They read SEC filings
 and free market data, and show the source of every number.
 
 > Educational use only, not financial advice. Read the [disclaimer](#disclaimer).
 
-| skill | the question | how it answers |
+| bot | the question | how it answers |
 | --- | --- | --- |
-| `/idea-scanner` | What is worth a closer look? | Scans every US-listed SEC filer (about 1,800 worth $1B+) through stated lenses (quality compounders, expectations gap, fallen quality, accelerating growth, fresh catalysts) with 8-K newsflow, red flags and headlines. Also scans a watchlist for news. |
-| `/scorecard` | How attractive is it, all things weighed? | A 0-100 score on five weighted pillars, every input with its rule and source: operating quality, recent trend, forward growth (consensus, the company's own guidance and how often it beat it), valuation (absolute, against peers, against its own 10-year P/E) and catalysts and risk. Claude adds the thesis, drivers and risks from the filings. |
-| `/priced-in` | What does the price already expect? | A reverse DCF: the growth rate today's price implies, checked against the company's own record and the base rate for every US company its size since 2011. |
-| `/buy-zones` | Where is a good price to start buying? | Support zones found by rules (swing lows, old ceilings turned floors, volume shelves, 200-day and 200-week averages), each with its track record, the odds of price getting there, and the growth priced in at that level. |
-| `/time-machine` | What could the next 10 years look like? | A Monte Carlo of 10,000 futures. The shape comes from the stock's real monthly returns, paired with the S&P 500. The center comes from Priced-In's growth scenarios, not from the past. |
+| **The Scout** `/the-scout` | What is worth a closer look? | Scans every US-listed SEC filer (about 1,800 worth $1B+) through stated lenses (quality compounders, expectations gap, fallen quality, accelerating growth, fresh catalysts) with 8-K newsflow, red flags and headlines. Also scans a watchlist for news. |
+| **The Judge** `/the-judge` | How attractive is it, all things weighed? | A 0-100 score on five weighted pillars, every input with its rule and source: operating quality, recent trend, forward growth (consensus, the company's own guidance and how often it beat it), valuation (absolute, against peers, against its own 10-year P/E) and catalysts and risk. Claude adds the thesis, drivers and risks from the filings. |
+| **The Mind Reader** `/the-mind-reader` | What does the price already expect? | A reverse DCF: the growth rate today's price implies, checked against the company's own record and the base rate for every US company its size since 2011. |
+| **The Sniper** `/the-sniper` | Where is a good price to start buying? | Support zones found by rules (swing lows, old ceilings turned floors, volume shelves, 200-day and 200-week averages), each with its track record, the odds of price getting there, and the growth priced in at that level. |
+| **The Time Traveller** `/the-time-traveller` | What could the next 10 years look like? | A Monte Carlo of 10,000 futures. The shape comes from the stock's real monthly returns, paired with the S&P 500. The center comes from The Mind Reader's growth scenarios, not from the past. |
 
-**Scan → Score it → Price it → Time it → Live it.** Each skill saves its
-results to `investor/<TICKER>.json`, and the next one picks them up.
+**The Scout finds it → The Judge scores it → The Mind Reader prices it → The
+Sniper times it → The Time Traveller lives it.** Each bot saves its results to
+`investor/<TICKER>.json`, and the next one picks them up.
 
 ## Quick start
 
@@ -49,7 +51,7 @@ read free public data.
 Every answer comes with a report page, and results are saved in an
 `investor/` folder wherever you work.
 
-Installed as a plugin, the commands carry a prefix (`/investor-skills:priced-in`).
+Installed as a plugin, the commands carry a prefix (`/investor-skills:the-mind-reader`).
 Plain-English requests work either way. After a plugin install, Claude Code
 greets you at the start of each session until setup is done.
 
@@ -59,18 +61,18 @@ greets you at the start of each session until setup is done.
   saved in an `investor/` folder inside it.
 - **Ask in plain English:**
 
-  | what you want | say something like |
-  |---|---|
-  | Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" |
-  | Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" |
-  | Is it expensive? | "What's priced into NVIDIA?" |
-  | When to buy | "Where are the buy zones for Microsoft?" |
-  | What could happen | "Simulate 10 years of owning Apple, $500 a month" |
+  | what you want | say something like | who answers |
+  |---|---|---|
+  | Ideas | "Scan the market for quality compounders", "What raised guidance this week?", "Any news on NVDA, KO and MSFT?" | The Scout |
+  | Is it attractive? | "Score Costco", "Give me a scorecard on Nvidia" | The Judge |
+  | Is it expensive? | "What's priced into NVIDIA?" | The Mind Reader |
+  | When to buy | "Where are the buy zones for Microsoft?" | The Sniper |
+  | What could happen | "Simulate 10 years of owning Apple, $500 a month" | The Time Traveller |
 
 - **What comes back:** a short answer in chat, a report page with the chart,
   tables and sources, and a chart image in `investor/charts/`.
-- **For one stock, go in order:** scan, scorecard, priced-in, buy zones, time
-  machine. Priced-In feeds the last two.
+- **For one stock, go in order:** The Scout, The Judge, The Mind Reader, The
+  Sniper, The Time Traveller. The Mind Reader feeds the last two.
 
 ## For Claude: installing from this page
 
@@ -86,27 +88,27 @@ If a user asks you to install the skills from this repository:
 
 ## Example: NVIDIA, October 22 2026
 
-These are real outputs from live runs that day. The offline tests replay the
-Priced-In figure from recorded data.
+These are real outputs from live runs that day. The offline tests replay The
+Mind Reader's figure from recorded data.
 
-- **Priced-In:** at $221.97, the price assumes free cash flow grows **16.2% a
+- **The Mind Reader (Priced-In):** at $221.97, the price assumes free cash flow grows **16.2% a
   year for 10 years**, if investors want 9% a year back. Of US companies
   that started a decade with over $50B in revenue, **3%** grew that fast.
   If NVIDIA grows like a typical company its size (2.8%), the return from
   today's price is **-3.6% a year**. If it keeps its own 10-year pace, it is
   36.6%.
-- **Time Machine:** $10,000 for 10 years, if it delivers exactly what is
+- **The Time Traveller (Time Machine):** $10,000 for 10 years, if it delivers exactly what is
   priced in:
   - Futures: bad $1,527, typical $24,380, great $326,969. S&P alone, typical: $24,829.
   - It beats the S&P in 50% of futures, and loses money in 29%.
   - The typical worst fall along the way is -77%.
   - In other words, the market's return with far bigger swings.
-- **Buy Zones:**
+- **The Sniper (Buy Zones):**
   - $208-216 (strength 56), $179-185 (51) and $164-171 (50).
   - Odds of price reaching the deepest zone within a year: 37%.
   - Valuation floor: $110. Below that, the price would only assume what a
     top-quarter company its size achieves. No chart zone reaches it.
-- **Scorecard:** 81/100, Highly Attractive, confidence High (peers AVGO, AMD,
+- **The Judge (Scorecard):** 81/100, Highly Attractive, confidence High (peers AVGO, AMD,
   TSM, MU).
   - Pillars: quality 86, trend 92, forward growth 95, valuation 70, catalysts
     and risk 59.
@@ -116,7 +118,7 @@ Priced-In figure from recorded data.
     yield and EV/EBITDA above the peer median.
   - Weakest pillar: one direct customer is 22% of revenue, and buybacks plus
     dividends are only 1.2% of the market value.
-- **Idea Scanner** (whole market, same day):
+- **The Scout (Idea Scanner)**, whole market, same day:
   - It scanned 1,755 companies; 81 passed quality compounders, 108 the
     expectations gap and 92 fallen quality.
   - NVIDIA passes quality compounders and the expectations gap.
@@ -135,7 +137,7 @@ sized for video.
 - **Without the plugin system:** download this repository (the green **Code**
   button, then **Download ZIP**), unzip it, and tell Claude Code *"copy the
   folders in investor-skills/skills into my ~/.claude/skills folder"*. The
-  commands are then plain `/priced-in` and so on.
+  commands are then plain `/the-mind-reader` and so on.
 - **By hand:** copy each folder in `skills/` into `~/.claude/skills/`. Each
   folder is self-contained.
 
@@ -161,7 +163,7 @@ connection to sec.gov and yahoo.com.
 
 ## The method, and why it is built this way
 
-**Priced-In.**
+**The Mind Reader (Priced-In).**
 - Market cap + debt - cash - short-term investments = enterprise value.
 - Free cash flow = operating cash flow - capex - stock compensation, over
   the trailing twelve months, built from 10-K and 10-Q data.
@@ -180,7 +182,7 @@ connection to sec.gov and yahoo.com.
   equal the discount rate exactly at the priced-in growth, which ties every
   scenario to the same model.
 
-**Time Machine.**
+**The Time Traveller (Time Machine).**
 - **The draws:** a stationary block bootstrap (Politis-Romano, mean block 12
   months) draws real months of the stock's total return, paired with SPY's
   in the same month. Crashes stay clustered and the stock keeps its link to
@@ -197,7 +199,7 @@ connection to sec.gov and yahoo.com.
 - **History beside it:** it prints every real rolling window from the
   stock's own history next to the simulation.
 
-**Buy Zones.**
+**The Sniper (Buy Zones).**
 - **The levels:** weekly pivots (4 weeks each side) with a 1.5-year
   recency half-life, role reversal (a swing high held above for 4 weeks),
   a 2-year volume-by-price profile, and the 200-day and 200-week averages.
@@ -208,7 +210,7 @@ connection to sec.gov and yahoo.com.
   zone. They are checked against how often a fall that deep happened in the
   last 5 years. The two agree within a few points on the stocks tested.
 
-**Scorecard.**
+**The Judge (Scorecard).**
 - **Every input is a rule:** it scores 0-100 on a straight line between two
   printed values (free cash flow yield: 0 at 1%, 100 at 7%). A pillar is the
   average of its inputs; the composite weights quality, trend and forward
@@ -228,12 +230,12 @@ connection to sec.gov and yahoo.com.
   It handles negations, groups ("ten largest customers"), distributors,
   receivables-only mentions and "respectively" lists.
 
-**Idea Scanner.**
+**The Scout (Idea Scanner).**
 - **One request per number for the whole market:** SEC XBRL frames return
   one figure for every filer (about 110 requests, cached), and Yahoo prices
   400 tickers per request.
 - **Same definitions as the single-company skills:** return on capital as in
-  the Scorecard, and the expectations gap from Priced-In's reverse DCF.
+  The Judge, and the expectations gap from The Mind Reader's reverse DCF.
 - **Rules against the usual screening traps:**
   - own growth is the lower of the 3-year and last-year rates, so post-COVID
     rebounds do not count, and it is capped at 40% a year;
@@ -257,11 +259,11 @@ connection to sec.gov and yahoo.com.
   out, so the real odds are somewhat worse than shown.
 - Support zones are fitted to the same history their records are measured
   on, which flatters them a little. The output says so.
-- The Scorecard's thresholds are judgment calls (each is printed), and
+- The Judge's thresholds are judgment calls (each is printed), and
   consensus and peer figures are Yahoo's estimates. Banks, insurers and very
   young companies fit its rules poorly.
-- The Idea Scanner uses the last full calendar year from SEC frames, so it
-  can differ from Priced-In's trailing-twelve-month figures. Companies that
+- The Scout uses the last full calendar year from SEC frames, so it
+  can differ from The Mind Reader's trailing-twelve-month figures. Companies that
   hold customer money can show inflated cash flow, and a headline that names
   a company can be mostly about another one.
 

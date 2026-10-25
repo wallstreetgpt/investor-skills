@@ -4,10 +4,10 @@ import unittest
 
 from _helpers import Offline, ik, load, run
 
-pricedin = load("priced-in", "pricedin")
-tm = load("time-machine", "timemachine")
-bz = load("buy-zones", "buyzones")
-sc = load("scorecard", "scorecard")
+pricedin = load("the-mind-reader", "pricedin")
+tm = load("the-time-traveller", "timemachine")
+bz = load("the-sniper", "buyzones")
+sc = load("the-judge", "scorecard")
 
 
 class Reports(unittest.TestCase):

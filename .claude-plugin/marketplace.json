@@ -7,7 +7,7 @@
     {
       "name": "investor-skills",
       "source": "./",
-      "description": "Idea Scanner, Attractiveness Scorecard, Priced-In Calculator, Buy Zone Finder and Time Machine: research tools for long-term investors, built on SEC filings and free market data."
+      "description": "Five research bots for long-term investors: The Scout (idea scanner), The Judge (scorecard), The Mind Reader (what's priced in), The Sniper (buy zones) and The Time Traveller (10,000 simulated futures), built on SEC filings and free market data."
     }
   ]
 }

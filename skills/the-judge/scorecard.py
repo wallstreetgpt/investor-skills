@@ -668,7 +668,7 @@ def build_metrics(d, notes=None):
                     part="absolute"))
     M.append(metric("v_gap", "valuation", "Own growth minus the growth the price assumes", gap, "pp", -0.10, 0.10,
                     T["calc"], part="absolute",
-                    rule="reverse DCF on free cash flow (9%% required return, %d years, then 2.5%%), as /priced-in; "
+                    rule="reverse DCF on free cash flow (9%% required return, %d years, then 2.5%%), as /the-mind-reader; "
                          "0 at -10 pts, 100 at +10 pts" % YEARS))
     # 4b. against peers (Yahoo's figures for every company, so like is compared with like)
     peer_rows = d.get("peers") or []
@@ -1179,7 +1179,7 @@ def report(d, ev, notes, prior=None):
         strip.append('<span>Latest filing <b>%s, quarter ended %s</b>%s</span>' % (E(T["q"].replace("FY", " FY")), nice_date(q["end"]), tag(T["q"])))
     strip.append('<span>Fiscal year ended <b>%s</b>%s</span>' % (nice_date(d["rows"][-1]["end"]), tag(T["k"])))
     exch = y.get("exchange") or ""
-    head = ('<header class="masthead"><div class="mast-row"><div class="mast-id"><p class="eyebrow">Attractiveness Scorecard</p>'
+    head = ('<header class="masthead"><div class="mast-row"><div class="mast-id"><p class="eyebrow">The Judge · Attractiveness Scorecard</p>'
             '<h1 class="display">%s</h1><p class="small muted" style="margin:4px 0 0">%s%s · Reporting currency %s</p></div>'
             '<dl class="mast-facts">%s</dl></div><div class="filing-strip">%s</div></header>'
             % (E(notes.get("company_name") or y.get("short_name") or d["name"]), E(d["ticker"]), (" · " + E(exch)) if exch else "", E(d["currency"]),
@@ -1412,7 +1412,7 @@ def card(d, ev):
     """The verdict as a standalone image (for video): score, band and the five pillars."""
     W, H = 960, 540
     b = ['<text class="title" x="60" y="62">%s</text>' % E(d["ticker"]),
-         '<text class="sub" x="60" y="90">Attractiveness scorecard · %s</text>' % E(nice_date(ik.today().isoformat())),
+         '<text class="sub" x="60" y="90">The Judge · attractiveness scorecard · %s</text>' % E(nice_date(ik.today().isoformat())),
          '<text class="title" x="60" y="200" style="font-size:96px">%d</text>' % round(ev["score"]),
          '<text class="sub" x="62" y="236">%s · confidence %s</text>' % (E(ev["band"]), E(ev["confidence"].lower()))]
     yy = 140
